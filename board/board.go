@@ -239,11 +239,45 @@ func (board *Board) String() string {
 	}
 
 	var positionStr string
-	for i := 0; i < 8; i++ {
-		positionStr += fmt.Sprint(position[i])
+	for _, rank := range position {
+		positionStr += fmt.Sprint(rank)
 		positionStr += "\n"
 	}
 	return positionStr
+}
+
+// PrintBitboards Outputs all internal bitboards in an easy to view way
+func (board *Board) PrintBitboards() {
+	for idx, bitboard := range board.bitboards {
+		switch idx {
+		case WP:
+			fmt.Printf("WhitePawn bitboard:\n")
+		case BP:
+			fmt.Printf("BlackPawn bitboard:\n")
+		case WR:
+			fmt.Printf("WhiteRook bitboard:\n")
+		case BR:
+			fmt.Printf("BlackRook bitboard:\n")
+		case WN:
+			fmt.Printf("WhiteKnight bitboard:\n")
+		case BN:
+			fmt.Printf("BlackKnight bitboard:\n")
+		case WB:
+			fmt.Printf("WhiteBishop bitboard:\n")
+		case BB:
+			fmt.Printf("BlackBishop bitboard:\n")
+		case WQ:
+			fmt.Printf("WhiteQueen bitboard:\n")
+		case BQ:
+			fmt.Printf("BlackQueen bitboard:\n")
+		case WK:
+			fmt.Printf("WhiteKing bitboard:\n")
+		case BK:
+			fmt.Printf("BlackKing bitboard:\n")
+		}
+		DrawBitboard(bitboard)
+		fmt.Println()
+	}
 }
 
 // convertStringToBitboard Helper for converting binary strings to bitboards
