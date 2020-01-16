@@ -31,11 +31,16 @@ const (
 	BR
 	BQ
 	BK
+	EP  // en passant file bitboard
 )
 
 // Board Struct to represent the chess board
 type Board struct {
-	bitboards [12]uint64
+	bitboards [13]uint64
+	whiteCastleKingSide bool
+	whiteCastleQueenSide bool
+	blackCastleKingSide bool
+	blackCastleQueenSide bool
 }
 
 // ParseStringArray Parses a 8x8 string array that represents a
@@ -274,6 +279,8 @@ func (board *Board) PrintBitboards() {
 			fmt.Printf("WhiteKing bitboard:\n")
 		case BK:
 			fmt.Printf("BlackKing bitboard:\n")
+		case EP:
+			fmt.Printf("EnPassant bitboard:\n")
 		}
 		DrawBitboard(bitboard)
 		fmt.Println()

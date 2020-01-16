@@ -3,6 +3,7 @@ package board
 import (
 	"testing"
 	"fmt"
+	"time"
 )
 
 func TestPossibleMovesWhite(t *testing.T) {
@@ -19,7 +20,14 @@ func TestPossibleMovesWhite(t *testing.T) {
 		[8]string{"R", "N", "B", "Q", "K", "B", "N", "R"}})
 
 
-	moveList := board.PossibleMovesWhite("1636")
-	fmt.Println(len(moveList) / 4)
+	start := time.Now()
+	for i := 0; i < 1000; i++ {
+		board.PossibleMovesWhite()
+	}
+	end := time.Since(start)
+	fmt.Printf("MoveGen (1000): %s\n", end)
+	// moveList := board.PossibleMovesBlack()
+
+	// fmt.Println(len(moveList) / 4)
 	t.Errorf("Error")
 }
