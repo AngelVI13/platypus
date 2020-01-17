@@ -98,13 +98,78 @@ var CastleRooks [4]int = [4]int{63, 56, 7, 0}
 
 // Move Move type
 type Move struct {
-	Move  int
+	Move  int  // todo consider move to be uint32 instead of int
 	score int
 }
+
+/* Game move - information stored in the move int from type Move
+               |Ca| |--To-||-From-|
+0000 0000 0000 0000 0000 0011 1111 -> From - 0x3F
+0000 0000 0000 0000 1111 1100 0000 -> To - >> 6, 0x3F
+0000 0000 0000 1111 0000 0000 0000 -> Captured - >> 12, 0xF
+0000 0000 0001 0000 0000 0000 0000 -> En passant capt - >> 16 - 0x40000
+0000 0000 0010 0000 0000 0000 0000 -> PawnStart - >> 17 - 0x80000
+0000 0011 1100 0000 0000 0000 0000 -> Promotion to what piece - >> 18, 0xF
+0000 0100 0000 0000 0000 0000 0000 -> Castle - >> 22 0x1000000
+*/
+
+// FromSq - macro that returns the 'from' bits from the move int
+func FromSq(m int) int {
+	return m & 0x3f
+}
+
+// ToSq - macro that returns the 'to' bits from the move int
+func ToSq(m int) int {
+	return (m >> 6) & 0x3f
+}
+
+// Captured - macro that returns the 'Captured' bits from the move int
+func Captured(m int) int {
+	return (m >> 12) & 0xf
+}
+
+// Promoted - macro that returns the 'Promoted' bits from the move int
+func Promoted(m int) int {
+	return (m >> 18) & 0xf
+}
+
+// PawnStartFlag - macro that returns the 'PawnStart' flag bits from the move int
+func PawnStartFlag(m int) int {
+	return (m >> 17) & 1
+}
+
+// EnPassantFlag - macro that returns the 'EnPassant' capture flag bits from the move int
+func EnPassantFlag(m int) int {
+	return (m >> 16) & 1
+}
+
+// CastleFlag - macro that returns the 'CastleFlag' flag bits from the move int
+func CastleFlag(m int) int {
+	return (m >> 22) & 1
+}
+
+// GetMoveInt creates and returns a move int from given move information
+func GetMoveInt(fromSq, toSq, capturePiece, promotionPiece, flag int) int {
+	return fromSq | (toSq << 6) | (capturePiece << 12) | (promotionPiece << 18) | flag
+}
+
+const (
+	// MoveFlagEnPass move flag that denotes if the capture was an enpass
+	MoveFlagEnPass int = 0x10000
+	// MoveFlagPawnStart move flag that denotes if move was pawn start (2x)
+	MoveFlagPawnStart int = 0x20000
+	// MoveFlagCapture move flag that denotes if move was capture without saying what the capture was (checks capture & enpas squares)
+	MoveFlagCapture int = 0xF000
+	// MoveFlagPromotion move flag that denotes if move was promotion without saying what the promotion was
+	MoveFlagPromotion int = 0x3C0000
+	// MoveFlagCastle move flag that denotes if move was castling
+	MoveFlagCastle int = 0x400000
+)
 
 // MaxPositionMoves maximum number of possible moves for a given position
 const MaxPositionMoves int = 256
 
+// MoveList Struct to hold all generated moves for a given position
 type MoveList struct {
 	Moves [MaxPositionMoves]Move
 	Count int // number of moves on the moves list

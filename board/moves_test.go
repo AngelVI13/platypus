@@ -34,6 +34,60 @@ func TestPossibleMovesWhite(t *testing.T) {
 	t.Errorf("Error")
 }
 
+func TestGetMoveInt1(t *testing.T) {
+	move := GetMoveInt(63, 0, WP, WQ, MoveFlagPawnStart)
+
+	if FromSq(move) != 63 {
+		t.Error("Wrong FROM square")
+	}
+	if ToSq(move) != 0 {
+		t.Error("Wrong TO square")
+	}
+	if Promoted(move) != WQ {
+		t.Error("Wrong PROMOTED piece")
+	}
+	if Captured(move) != WP {
+		t.Error("Wrong CAPTURED square")
+	}
+	if EnPassantFlag(move) != 0 {
+		t.Error("Wrong EN_PASSANT_FLAG square")
+	}
+	if PawnStartFlag(move) != 1 {
+		t.Error("Wrong PAWN_START_FLAG square")
+	}
+
+	if CastleFlag(move) != 0 {
+		t.Error("Wrong PAWN_START_FLAG square")
+	}
+}
+
+func TestGetMoveInt2(t *testing.T) {
+	move := GetMoveInt(15, 27, WR, WN, MoveFlagCastle)
+
+	if FromSq(move) != 15 {
+		t.Error("Wrong FROM square")
+	}
+	if ToSq(move) != 27 {
+		t.Error("Wrong TO square")
+	}
+	if Promoted(move) != WN {
+		t.Error("Wrong PROMOTED piece")
+	}
+	if Captured(move) != WR {
+		t.Error("Wrong CAPTURED square")
+	}
+	if EnPassantFlag(move) != 0 {
+		t.Error("Wrong EN_PASSANT_FLAG square")
+	}
+	if PawnStartFlag(move) != 0 {
+		t.Error("Wrong PAWN_START_FLAG square")
+	}
+
+	if CastleFlag(move) != 1 {
+		t.Error("Wrong PAWN_START_FLAG square")
+	}
+}
+
 func BenchmarkPossibleMovesWhite(b *testing.B) {
 	board := Board{}
 	board.ParseStringArray(StartingPosition)
@@ -135,27 +189,6 @@ func BenchmarkUpdateVarsPossibleMovesWhite(b *testing.B) {
 		for j := 0; j < 50; j++ {
 			moveList.WriteString(fmt.Sprintf("hel%d", j))
 		}
-	}
-	b.StopTimer()
-}
-
-
-func BenchmarkExample1(b *testing.B) {
-	board := Board{}
-	board.ParseStringArray(StartingPosition)
-
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		board.Examplefunc()
-	}
-	b.StopTimer()
-}
-
-func BenchmarkExample2(b *testing.B) {
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		Examplefunc2()
 	}
 	b.StopTimer()
 }
