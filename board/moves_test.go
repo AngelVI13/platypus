@@ -1,10 +1,9 @@
 package board
 
 import (
-	"testing"
 	"fmt"
-	"time"
 	"strings"
+	"testing"
 )
 
 func TestPossibleMovesWhite(t *testing.T) {
@@ -20,21 +19,19 @@ func TestPossibleMovesWhite(t *testing.T) {
 		[8]string{"P", "P", "P", "P", "P", "P", "P", "P"},
 		[8]string{"R", "N", "B", "Q", "K", "B", "N", "R"}})
 
+	// enabl all files on enpassant bitboard
+	board.bitboards[EP] = ^uint64(0)
 
-	start := time.Now()
-	for i := 0; i < 1000; i++ {
-		var moveList strings.Builder
-		board.PossibleMovesWhite(&moveList)
-	}
-	end := time.Since(start)
-	fmt.Printf("MoveGen (1000): %s\n", end)
+	var moveList MoveList
+	board.PossibleMovesWhite(&moveList)
+	PrintMoveList(&moveList)
 	// moveList := board.PossibleMovesBlack()
 
 	// fmt.Println(len(moveList) / 4)
 	t.Errorf("Error")
 }
 
-func TestGetMoveInt1(t *testing.T) {
+func TestGetMoveIntPawnStart(t *testing.T) {
 	move := GetMoveInt(63, 0, WP, WQ, MoveFlagPawnStart)
 
 	if FromSq(move) != 63 {
@@ -61,7 +58,7 @@ func TestGetMoveInt1(t *testing.T) {
 	}
 }
 
-func TestGetMoveInt2(t *testing.T) {
+func TestGetMoveIntCastle(t *testing.T) {
 	move := GetMoveInt(15, 27, WR, WN, MoveFlagCastle)
 
 	if FromSq(move) != 15 {
@@ -88,14 +85,40 @@ func TestGetMoveInt2(t *testing.T) {
 	}
 }
 
+func TestGetMoveIntEnPassant(t *testing.T) {
+	move := GetMoveInt(31, 4, WB, WR, MoveFlagEnPass)
+
+	if FromSq(move) != 31 {
+		t.Error("Wrong FROM square")
+	}
+	if ToSq(move) != 4 {
+		t.Error("Wrong TO square")
+	}
+	if Promoted(move) != WR {
+		t.Error("Wrong PROMOTED piece")
+	}
+	if Captured(move) != WB {
+		t.Error("Wrong CAPTURED square")
+	}
+	if EnPassantFlag(move) != 1 {
+		t.Error("Wrong EN_PASSANT_FLAG square")
+	}
+	if PawnStartFlag(move) != 0 {
+		t.Error("Wrong PAWN_START_FLAG square")
+	}
+
+	if CastleFlag(move) != 0 {
+		t.Error("Wrong PAWN_START_FLAG square")
+	}
+}
+
 func BenchmarkPossibleMovesWhite(b *testing.B) {
 	board := Board{}
 	board.ParseStringArray(StartingPosition)
 
-
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		var moveList strings.Builder
+		var moveList MoveList
 		board.PossibleMovesWhite(&moveList)
 	}
 	b.StopTimer()
@@ -107,7 +130,7 @@ func BenchmarkUnwrappedPossibleMovesWhite(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		var moveList strings.Builder
+		var moveList MoveList
 		NotMyPieces = ^(board.bitboards[WP] |
 			board.bitboards[WN] |
 			board.bitboards[WB] |
@@ -138,15 +161,15 @@ func BenchmarkUnwrappedPossibleMovesWhite(b *testing.B) {
 		Empty = ^Occupied
 
 		board.possibleWhitePawn(&moveList)
-		board.possibleKnightMoves(&moveList, board.bitboards[WN])
-		board.possibleBishopMoves(&moveList, board.bitboards[WB])
-		board.possibleRookMoves(&moveList, board.bitboards[WR])
-		board.possibleQueenMoves(&moveList, board.bitboards[WQ])
-		board.possibleKingMoves(&moveList, board.bitboards[WK])
-		board.possibleCastleWhite(
-			&moveList,
-			board.whiteCastleKingSide,
-			board.whiteCastleQueenSide)
+		// board.possibleKnightMoves(&moveList, board.bitboards[WN])
+		// board.possibleBishopMoves(&moveList, board.bitboards[WB])
+		// board.possibleRookMoves(&moveList, board.bitboards[WR])
+		// board.possibleQueenMoves(&moveList, board.bitboards[WQ])
+		// board.possibleKingMoves(&moveList, board.bitboards[WK])
+		// board.possibleCastleWhite(
+		// 	&moveList,
+		// 	board.whiteCastleKingSide,
+		// 	board.whiteCastleQueenSide)
 	}
 	b.StopTimer()
 }
@@ -188,6 +211,48 @@ func BenchmarkUpdateVarsPossibleMovesWhite(b *testing.B) {
 		Empty = ^Occupied
 		for j := 0; j < 50; j++ {
 			moveList.WriteString(fmt.Sprintf("hel%d", j))
+		}
+	}
+	b.StopTimer()
+}
+
+func BenchmarkUpdateVarsPossibleMovesWhiteOptimized(b *testing.B) {
+	board := Board{}
+	board.ParseStringArray(StartingPosition)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		var moveList MoveList
+		NotMyPieces = ^(board.bitboards[WP] |
+			board.bitboards[WN] |
+			board.bitboards[WB] |
+			board.bitboards[WR] |
+			board.bitboards[WQ] |
+			board.bitboards[WK] |
+			board.bitboards[BK])
+
+		MyPieces = (board.bitboards[WP] |
+			board.bitboards[WN] |
+			board.bitboards[WB] |
+			board.bitboards[WR] |
+			board.bitboards[WQ])
+
+		Occupied = (board.bitboards[WP] |
+			board.bitboards[WN] |
+			board.bitboards[WB] |
+			board.bitboards[WR] |
+			board.bitboards[WQ] |
+			board.bitboards[WK] |
+			board.bitboards[BP] |
+			board.bitboards[BN] |
+			board.bitboards[BB] |
+			board.bitboards[BR] |
+			board.bitboards[BQ] |
+			board.bitboards[BK])
+
+		Empty = ^Occupied
+		for j := 0; j < 50; j++ {
+			moveList.AddMove(GetMoveInt(63, 63, WP, WB, MoveFlagEnPass))
 		}
 	}
 	b.StopTimer()
