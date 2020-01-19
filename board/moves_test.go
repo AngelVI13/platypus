@@ -23,8 +23,8 @@ func TestPossibleMovesWhite(t *testing.T) {
 	board.bitboards[EP] = ^uint64(0)
 
 	var moveList MoveList
-	// board.PossibleMovesWhite(&moveList)
-	board.PossibleMovesBlack(&moveList)
+	board.PossibleMovesWhite(&moveList)
+	// board.PossibleMovesBlack(&moveList)
 	PrintMoveList(&moveList)
 	// moveList := board.PossibleMovesBlack()
 
