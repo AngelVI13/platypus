@@ -23,12 +23,61 @@ func TestPossibleMovesWhite(t *testing.T) {
 	board.bitboards[EP] = ^uint64(0)
 
 	var moveList MoveList
-	board.PossibleMovesWhite(&moveList)
+	// board.PossibleMovesWhite(&moveList)
+	board.PossibleMovesBlack(&moveList)
 	PrintMoveList(&moveList)
 	// moveList := board.PossibleMovesBlack()
 
 	// fmt.Println(len(moveList) / 4)
 	t.Errorf("Error")
+}
+
+func TestPossiblePawnMovesWhite(t *testing.T) {
+	board := Board{}
+	// board.ParseStringArray(StartingPosition)
+	board.ParseStringArray([8][8]string{
+		[8]string{" ", "n", "b", "q", "k", "b", "n", "r"},
+		[8]string{"P", "p", " ", "p", " ", "p", "P", "p"},
+		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+		[8]string{" ", " ", "p", "P", "p", " ", " ", " "},
+		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+		[8]string{"P", "P", "P", "P", "P", "P", "P", "P"},
+		[8]string{"R", "N", "B", "Q", "K", "B", "N", "R"}})
+
+	// enable all files on enpassant bitboard
+	board.bitboards[EP] = ^uint64(0)
+
+	var moveList MoveList
+	board.PossibleMovesWhite(&moveList)
+
+	if moveList.Count+1 != 36 {
+		t.Errorf("Incorrect number of moves for white pawns")
+	}
+}
+
+func TestPossiblePawnMovesBlack(t *testing.T) {
+	board := Board{}
+	// board.ParseStringArray(StartingPosition)
+	board.ParseStringArray([8][8]string{
+		[8]string{"r", "n", "b", "q", "k", "b", "n", "r"},
+		[8]string{"p", "p", "p", "p", "p", "p", "p", "p"},
+		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+		[8]string{" ", " ", "P", "p", "P", " ", " ", " "},
+		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+		[8]string{"p", "P", " ", "P", " ", "P", "p", "P"},
+		[8]string{" ", "N", "B", "Q", "K", "B", "N", "R"}})
+
+	// enable all files on enpassant bitboard
+	board.bitboards[EP] = ^uint64(0)
+
+	var moveList MoveList
+	board.PossibleMovesBlack(&moveList)
+
+	if moveList.Count+1 != 36 {
+		t.Errorf("Incorrect number of moves for white pawns")
+	}
 }
 
 func TestGetMoveIntPawnStart(t *testing.T) {

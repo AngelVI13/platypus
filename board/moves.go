@@ -266,12 +266,6 @@ func (board *Board) PossibleMovesWhite(moveList *MoveList) {
 	// This represents all squares which are not white pieces (including empty squares).
 	// Black king is added in order to avoid generating capture moves on the black king.
 	// For example pawn takes king is not a legal move
-	EnemyPieces = (board.bitboards[BP] |
-		board.bitboards[BN] |
-		board.bitboards[BB] |
-		board.bitboards[BR] |
-		board.bitboards[BQ])
-
 	NotMyPieces = ^(board.bitboards[WP] |
 		board.bitboards[WN] |
 		board.bitboards[WB] |
@@ -279,6 +273,12 @@ func (board *Board) PossibleMovesWhite(moveList *MoveList) {
 		board.bitboards[WQ] |
 		board.bitboards[WK] |
 		board.bitboards[BK])
+
+	EnemyPieces = (board.bitboards[BP] |
+		board.bitboards[BN] |
+		board.bitboards[BB] |
+		board.bitboards[BR] |
+		board.bitboards[BQ])
 
 	MyPieces = (board.bitboards[WP] |
 		board.bitboards[WN] |
@@ -313,55 +313,57 @@ func (board *Board) PossibleMovesWhite(moveList *MoveList) {
 	// board.whiteCastleQueenSide)
 }
 
-// func (board *Board) PossibleMovesBlack() string {
-// 	// This represents all squares which are not white pieces (including empty squares).
-// 	// Black king is added in order to avoid generating capture moves on the black king.
-// 	// For example pawn takes king is not a legal move
-// 	NotMyPieces = ^(board.bitboards[BP] |
-// 		board.bitboards[BN] |
-// 		board.bitboards[BB] |
-// 		board.bitboards[BR] |
-// 		board.bitboards[BQ] |
-// 		board.bitboards[BK] |
-// 		board.bitboards[WK])
+func (board *Board) PossibleMovesBlack(moveList *MoveList) {
+	// This represents all squares which are not white pieces (including empty squares).
+	// Black king is added in order to avoid generating capture moves on the black king.
+	// For example pawn takes king is not a legal move
+	NotMyPieces = ^(board.bitboards[BP] |
+		board.bitboards[BN] |
+		board.bitboards[BB] |
+		board.bitboards[BR] |
+		board.bitboards[BQ] |
+		board.bitboards[BK] |
+		board.bitboards[WK])
 
-// 	MyPieces = (board.bitboards[BP] |
-// 		board.bitboards[BN] |
-// 		board.bitboards[BB] |
-// 		board.bitboards[BR] |
-// 		board.bitboards[BQ])
+	EnemyPieces = (board.bitboards[WP] |
+		board.bitboards[WN] |
+		board.bitboards[WB] |
+		board.bitboards[WR] |
+		board.bitboards[WQ])
 
-// 	Occupied = (board.bitboards[WP] |
-// 		board.bitboards[WN] |
-// 		board.bitboards[WB] |
-// 		board.bitboards[WR] |
-// 		board.bitboards[WQ] |
-// 		board.bitboards[WK] |
-// 		board.bitboards[BP] |
-// 		board.bitboards[BN] |
-// 		board.bitboards[BB] |
-// 		board.bitboards[BR] |
-// 		board.bitboards[BQ] |
-// 		board.bitboards[BK])
+	MyPieces = (board.bitboards[BP] |
+		board.bitboards[BN] |
+		board.bitboards[BB] |
+		board.bitboards[BR] |
+		board.bitboards[BQ])
 
-// 	Empty = ^Occupied
+	Occupied = (board.bitboards[WP] |
+		board.bitboards[WN] |
+		board.bitboards[WB] |
+		board.bitboards[WR] |
+		board.bitboards[WQ] |
+		board.bitboards[WK] |
+		board.bitboards[BP] |
+		board.bitboards[BN] |
+		board.bitboards[BB] |
+		board.bitboards[BR] |
+		board.bitboards[BQ] |
+		board.bitboards[BK])
 
-// 	var moveList strings.Builder
+	Empty = ^Occupied
 
-// 	// todo the following could be split into goroutines
-// 	board.possibleBlackPawn(&moveList)
-// 	board.possibleKnightMoves(&moveList, board.bitboards[BN])
-// 	board.possibleBishopMoves(&moveList, board.bitboards[BB])
-// 	board.possibleRookMoves(&moveList, board.bitboards[BR])
-// 	board.possibleQueenMoves(&moveList, board.bitboards[BQ])
-// 	board.possibleKingMoves(&moveList, board.bitboards[BK])
-// 	board.possibleCastleBlack(
-// 		&moveList,
-// 		board.blackCastleKingSide,
-// 		board.blackCastleQueenSide)
-
-// 	return moveList.String()
-// }
+	// todo the following could be split into goroutines
+	board.possibleBlackPawn(moveList)
+	// board.possibleKnightMoves(&moveList, board.bitboards[BN])
+	// board.possibleBishopMoves(&moveList, board.bitboards[BB])
+	// board.possibleRookMoves(&moveList, board.bitboards[BR])
+	// board.possibleQueenMoves(&moveList, board.bitboards[BQ])
+	// board.possibleKingMoves(&moveList, board.bitboards[BK])
+	// board.possibleCastleBlack(
+	// 	&moveList,
+	// 	board.blackCastleKingSide,
+	// 	board.blackCastleQueenSide)
+}
 
 func (board *Board) HorizontalAndVerticalMoves(square int) uint64 {
 	//! Requires Occupied to be up to date
@@ -453,6 +455,7 @@ func (board *Board) possibleWhitePawn(moveList *MoveList) {
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
+		// todo maybe Capture flag??
 		moveList.AddMove(GetMoveInt(index+7, index, 0, WQ, NoFlag))
 		moveList.AddMove(GetMoveInt(index+7, index, 0, WR, NoFlag))
 		moveList.AddMove(GetMoveInt(index+7, index, 0, WB, NoFlag))
@@ -465,6 +468,7 @@ func (board *Board) possibleWhitePawn(moveList *MoveList) {
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
+		// todo maybe Capture flag??
 		moveList.AddMove(GetMoveInt(index+9, index, 0, WQ, NoFlag))
 		moveList.AddMove(GetMoveInt(index+9, index, 0, WR, NoFlag))
 		moveList.AddMove(GetMoveInt(index+9, index, 0, WB, NoFlag))
@@ -499,116 +503,105 @@ func (board *Board) possibleWhitePawn(moveList *MoveList) {
 	}
 }
 
-// func (board *Board) possibleBlackPawn(moveList *strings.Builder) {
-// 	// todo movelist as string looks pretty stupid ???
+func (board *Board) possibleBlackPawn(moveList *MoveList) {
+	bp := board.bitboards[BP]
+	var possibility uint64 // holds one potential capture at a time
+	var index int          // index of the "possibility" capture
+	var pawnMoves uint64
 
-// 	bp := board.bitboards[BP]
-// 	var possibility uint64 // holds one potential capture at a time
-// 	var index int          // index of the "possibility" capture
-// 	var pawnMoves uint64
+	// captures and moves formward forward:
+	pawnMoves = (bp << 7) & (EnemyPieces) & (^Rank1) & (^FileH) // capture right
+	// Find first bit which is equal to '1' i.e. first capture
+	possibility = pawnMoves & (^(pawnMoves - 1))
+	for possibility != 0 {
+		index = bits.TrailingZeros64(possibility)
+		moveList.AddMove(GetMoveInt(index-7, index, 0, 0, MoveFlagCapture))
+		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
+		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
+	}
 
-// 	// captures and moves formward forward: x1,y1,x2,y2
-// 	//! here MyPieces are black pieces
-// 	pawnMoves = (bp << 7) & (MyPieces) & (^Rank1) & (^FileH) // capture right
-// 	// Find first bit which is equal to '1' i.e. first capture
-// 	possibility = pawnMoves & (^(pawnMoves - 1))
-// 	for possibility != 0 {
-// 		index = bits.TrailingZeros64(possibility)
-// 		//                                   final_rank     final_file     start_rank   start_file
-// 		moveList.WriteString(fmt.Sprintf("%d%d%d%d", (index/8 - 1), (index%8 + 1), (index / 8), (index % 8)))
-// 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
-// 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
-// 	}
+	pawnMoves = (bp << 9) & (EnemyPieces) & (^Rank1) & (^FileA) // capture left
+	possibility = pawnMoves & (^(pawnMoves - 1))
+	for possibility != 0 {
+		index = bits.TrailingZeros64(possibility)
+		moveList.AddMove(GetMoveInt(index-9, index, 0, 0, MoveFlagCapture))
+		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
+		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
+	}
 
-// 	pawnMoves = (bp << 9) & (MyPieces) & (^Rank1) & (^FileA) // capture left
-// 	possibility = pawnMoves & (^(pawnMoves - 1))
-// 	for possibility != 0 {
-// 		index = bits.TrailingZeros64(possibility)
-// 		//                                   final_rank     final_file     start_rank   start_file
-// 		moveList.WriteString(fmt.Sprintf("%d%d%d%d", (index/8 - 1), (index%8 - 1), (index / 8), (index % 8)))
-// 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
-// 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
-// 	}
+	pawnMoves = (bp << 8) & Empty & (^Rank1) // move 1 square forward
+	possibility = pawnMoves & (^(pawnMoves - 1))
+	for possibility != 0 {
+		index = bits.TrailingZeros64(possibility)
+		moveList.AddMove(GetMoveInt(index-8, index, 0, 0, NoFlag))
+		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
+		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
+	}
 
-// 	pawnMoves = (bp << 8) & Empty & (^Rank1) // move 1 square forward
-// 	possibility = pawnMoves & (^(pawnMoves - 1))
-// 	for possibility != 0 {
-// 		index = bits.TrailingZeros64(possibility)
-// 		//                                   final_rank     final_file start_rank   start_file
-// 		moveList.WriteString(fmt.Sprintf("%d%d%d%d", (index/8 - 1), (index % 8), (index / 8), (index % 8)))
-// 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
-// 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
-// 	}
+	// Move all pawns 2 ranks, check that, in between and on the final square there is nothing,
+	// also check that resulting square is on rank4.
+	// (instead of check I mean eliminate squares that do not comply with these conditions)
+	pawnMoves = (bp << 16) & Empty & (Empty << 8) & Rank5 // move 2 squares forward
+	possibility = pawnMoves & (^(pawnMoves - 1))
+	for possibility != 0 {
+		index = bits.TrailingZeros64(possibility)
+		moveList.AddMove(GetMoveInt(index-16, index, 0, 0, MoveFlagPawnStart))
+		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
+		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
+	}
 
-// 	// Move all pawns 2 ranks, check that, in between and on the final square there is nothing,
-// 	// also check that resulting square is on rank4.
-// 	// (instead of check I mean eliminate squares that do not comply with these conditions)
-// 	pawnMoves = (bp << 16) & Empty & (Empty << 8) & Rank5 // move 2 squares forward
-// 	possibility = pawnMoves & (^(pawnMoves - 1))
-// 	for possibility != 0 {
-// 		index = bits.TrailingZeros64(possibility)
-// 		//                                   final_rank     final_file start_rank   start_file
-// 		moveList.WriteString(fmt.Sprintf("%d%d%d%d", (index/8 - 2), (index % 8), (index / 8), (index % 8)))
-// 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
-// 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
-// 	}
+	// promotions
+	pawnMoves = (bp << 7) & EnemyPieces & Rank1 & (^FileH) // pawn promotion by capture right
+	possibility = pawnMoves & (^(pawnMoves - 1))
+	for possibility != 0 {
+		index = bits.TrailingZeros64(possibility)
+		// todo maybe Capture flag??
+		moveList.AddMove(GetMoveInt(index-7, index, 0, BQ, NoFlag))
+		moveList.AddMove(GetMoveInt(index-7, index, 0, BR, NoFlag))
+		moveList.AddMove(GetMoveInt(index-7, index, 0, BB, NoFlag))
+		moveList.AddMove(GetMoveInt(index-7, index, 0, BN, NoFlag))
+		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
+		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
+	}
 
-// 	// promotions - format: y1,y2,Promotion Type,"P"
-// 	pawnMoves = (bp << 7) & MyPieces & Rank1 & (^FileH) // pawn promotion by capture right
-// 	possibility = pawnMoves & (^(pawnMoves - 1))
-// 	for possibility != 0 {
-// 		index = bits.TrailingZeros64(possibility)
-// 		moveList.WriteString(fmt.Sprintf("%d%dQP %d%dRP %d%dBP %d%dNP",
-// 			(index/8 + 1), (index % 8),
-// 			(index/8 + 1), (index % 8),
-// 			(index/8 + 1), (index % 8),
-// 			(index/8 + 1), (index % 8)))
-// 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
-// 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
-// 	}
+	pawnMoves = (bp << 9) & EnemyPieces & Rank1 & (^FileA) // pawn promotion by capture left
+	possibility = pawnMoves & (^(pawnMoves - 1))
+	for possibility != 0 {
+		index = bits.TrailingZeros64(possibility)
+		// todo maybe Capture flag??
+		moveList.AddMove(GetMoveInt(index-9, index, 0, BQ, NoFlag))
+		moveList.AddMove(GetMoveInt(index-9, index, 0, BR, NoFlag))
+		moveList.AddMove(GetMoveInt(index-9, index, 0, BB, NoFlag))
+		moveList.AddMove(GetMoveInt(index-9, index, 0, BN, NoFlag))
+		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
+		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
+	}
 
-// 	pawnMoves = (bp << 9) & MyPieces & Rank1 & (^FileA) // pawn promotion by capture left
-// 	possibility = pawnMoves & (^(pawnMoves - 1))
-// 	for possibility != 0 {
-// 		index = bits.TrailingZeros64(possibility)
-// 		moveList.WriteString(fmt.Sprintf("%d%dQP %d%dRP %d%dBP %d%dNP",
-// 			(index/8 - 1), (index % 8),
-// 			(index/8 - 1), (index % 8),
-// 			(index/8 - 1), (index % 8),
-// 			(index/8 - 1), (index % 8)))
-// 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
-// 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
-// 	}
+	pawnMoves = (bp << 8) & Empty & Rank1 // pawn promotion by move 1 forward
+	possibility = pawnMoves & (^(pawnMoves - 1))
+	for possibility != 0 {
+		index = bits.TrailingZeros64(possibility)
+		moveList.AddMove(GetMoveInt(index-8, index, 0, BQ, NoFlag))
+		moveList.AddMove(GetMoveInt(index-8, index, 0, BR, NoFlag))
+		moveList.AddMove(GetMoveInt(index-8, index, 0, BB, NoFlag))
+		moveList.AddMove(GetMoveInt(index-8, index, 0, BN, NoFlag))
+		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
+		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
+	}
 
-// 	pawnMoves = (bp << 8) & Empty & Rank1 // pawn promotion by move 1 forward
-// 	possibility = pawnMoves & (^(pawnMoves - 1))
-// 	for possibility != 0 {
-// 		index = bits.TrailingZeros64(possibility)
-// 		moveList.WriteString(fmt.Sprintf("%d%dQP %d%dRP %d%dBP %d%dNP",
-// 			(index / 8), (index % 8),
-// 			(index / 8), (index % 8),
-// 			(index / 8), (index % 8),
-// 			(index / 8), (index % 8)))
-// 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
-// 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
-// 	}
-
-// 	// y1, y2, bE
-// 	// En passant right
-// 	possibility = (bp >> 1) & board.bitboards[WP] & Rank4 & (^FileH) & board.bitboards[EP] // shows piece to remove, not the destination
-// 	if possibility != 0 {
-// 		index = bits.TrailingZeros64(possibility)
-// 		//! This move is based from normal (white perspective) rank and file (starting from 1)
-// 		moveList.WriteString(fmt.Sprintf("%d%dbE", (index%8 + 1), (index % 8)))
-// 	}
-// 	// en passant left
-// 	// shows piece to remove, not the destination
-// 	possibility = (bp << 1) & board.bitboards[WP] & Rank4 & (^FileA) & board.bitboards[EP]
-// 	if possibility != 0 {
-// 		index = bits.TrailingZeros64(possibility)
-// 		moveList.WriteString(fmt.Sprintf("%d%d E", (index%8 - 1), (index % 8)))
-// 	}
-// }
+	// En passant right
+	possibility = (bp >> 1) & board.bitboards[WP] & Rank4 & (^FileH) & board.bitboards[EP]
+	if possibility != 0 {
+		index = bits.TrailingZeros64(possibility)
+		moveList.AddMove(GetMoveInt(index+1, index+8, 0, 0, MoveFlagEnPass))
+	}
+	// en passant left
+	possibility = (bp << 1) & board.bitboards[WP] & Rank4 & (^FileA) & board.bitboards[EP]
+	if possibility != 0 {
+		index = bits.TrailingZeros64(possibility)
+		moveList.AddMove(GetMoveInt(index-1, index+8, 0, 0, MoveFlagEnPass))
+	}
+}
 
 // func (board *Board) possibleKnightMoves(moveList *strings.Builder, knight uint64) {
 // 	// Choose bishop
