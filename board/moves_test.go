@@ -21,6 +21,7 @@ func TestPossibleMovesWhite(t *testing.T) {
 
 	// enabl all files on enpassant bitboard
 	board.bitboards[EP] = ^uint64(0)
+	board.castlePermissions = ^(int(0))
 
 	var moveList MoveList
 	board.PossibleMovesWhite(&moveList)

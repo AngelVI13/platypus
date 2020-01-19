@@ -31,16 +31,24 @@ const (
 	BR
 	BQ
 	BK
-	EP  // en passant file bitboard
+	EP // en passant file bitboard
+)
+
+// Defines for castling rights
+// The values are such that they each represent a bit from a 4 bit int value
+// for example if white can castle kingside and black can castle queenside
+// the 4 bit int value is going to be 1001
+const (
+	WhiteKingCastling  int = 1
+	WhiteQueenCastling int = 2
+	BlackKingCastling  int = 4
+	BlackQueenCastling int = 8
 )
 
 // Board Struct to represent the chess board
 type Board struct {
-	bitboards [13]uint64
-	whiteCastleKingSide bool
-	whiteCastleQueenSide bool
-	blackCastleKingSide bool
-	blackCastleQueenSide bool
+	bitboards         [13]uint64
+	castlePermissions int
 }
 
 // ParseStringArray Parses a 8x8 string array that represents a
