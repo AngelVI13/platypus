@@ -108,6 +108,9 @@ var Empty uint64
 // Occupied bitboard with all the occupied squares
 var Occupied uint64
 
+// Unsafe bitboard with all the unsafe squares for the current side
+var Unsafe uint64
+
 // Move Move type
 type Move struct {
 	Move  int // todo consider move to be uint32 instead of int

@@ -1,6 +1,8 @@
 package board
 
-import "math/bits"
+import (
+	"math/bits"
+)
 
 // PossibleMovesWhite Compute all possible white moves and add them to the move list
 func (board *Board) PossibleMovesWhite(moveList *MoveList) {
@@ -41,6 +43,8 @@ func (board *Board) PossibleMovesWhite(moveList *MoveList) {
 		board.bitboards[BK])
 
 	Empty = ^Occupied
+
+	Unsafe = board.unsafeForWhite()
 
 	board.possibleWhitePawn(moveList)
 	board.possibleKnightMoves(moveList, board.bitboards[WN])
@@ -90,6 +94,8 @@ func (board *Board) PossibleMovesBlack(moveList *MoveList) {
 		board.bitboards[BK])
 
 	Empty = ^Occupied
+
+	Unsafe = board.unsafeForBlack()
 
 	board.possibleBlackPawn(moveList)
 	board.possibleKnightMoves(moveList, board.bitboards[BN])
@@ -487,19 +493,35 @@ func (board *Board) possibleKingMoves(moveList *MoveList, king uint64) {
 }
 
 func (board *Board) possibleCastleWhite(moveList *MoveList) {
-	if (board.castlePermissions&WhiteKingCastling) != 0 && (((1 << CastleRooks[0]) & board.bitboards[WR]) != 0) {
+	kingIdx := bits.TrailingZeros64(board.bitboards[WK])
+	var queenSideSqBitboard uint64 = 1 << (kingIdx - 1) | 1 << (kingIdx - 2)
+	var kingSideSqBitboard uint64 = 1 << (kingIdx + 1) | 1 << (kingIdx + 2)
+
+	if (board.castlePermissions&WhiteKingCastling) != 0 && (((1 << CastleRooks[0]) & board.bitboards[WR]) != 0) && (
+		bits.OnesCount64((kingSideSqBitboard | board.bitboards[WK]) & ^Unsafe) == 3) && (
+		bits.OnesCount64(Empty & kingSideSqBitboard) == 2) {
 		moveList.AddMove(GetMoveInt(60, 62, 0, 0, MoveFlagCastle))
 	}
-	if (board.castlePermissions&WhiteQueenCastling) != 0 && (((1 << CastleRooks[1]) & board.bitboards[WR]) != 0) {
+	if (board.castlePermissions&WhiteQueenCastling) != 0 && (((1 << CastleRooks[1]) & board.bitboards[WR]) != 0) && (
+		bits.OnesCount64((queenSideSqBitboard | board.bitboards[WK]) & ^Unsafe) == 3) && (
+		bits.OnesCount64(Empty & (queenSideSqBitboard | 1 << (kingIdx - 3))) == 3) {  // on the queen side there are 3 sq that should be empty to enable castling
 		moveList.AddMove(GetMoveInt(60, 58, 0, 0, MoveFlagCastle))
 	}
 }
 
 func (board *Board) possibleCastleBlack(moveList *MoveList) {
-	if (board.castlePermissions&BlackKingCastling) != 0 && (((1 << CastleRooks[2]) & board.bitboards[BR]) != 0) {
+	kingIdx := bits.TrailingZeros64(board.bitboards[BK])
+	var queenSideSqBitboard uint64 = 1 << (kingIdx - 1) | 1 << (kingIdx - 2)
+	var kingSideSqBitboard uint64 = 1 << (kingIdx + 1) | 1 << (kingIdx + 2)
+
+	if (board.castlePermissions&BlackKingCastling) != 0 && (((1 << CastleRooks[2]) & board.bitboards[BR]) != 0) && (
+		bits.OnesCount64((kingSideSqBitboard | board.bitboards[BK]) & ^Unsafe) == 3) && (
+		bits.OnesCount64(Empty & kingSideSqBitboard) == 2) {
 		moveList.AddMove(GetMoveInt(4, 6, 0, 0, MoveFlagCastle))
 	}
-	if (board.castlePermissions&BlackQueenCastling) != 0 && (((1 << CastleRooks[3]) & board.bitboards[BR]) != 0) {
+	if (board.castlePermissions&BlackQueenCastling) != 0 && (((1 << CastleRooks[3]) & board.bitboards[BR]) != 0) && (
+		bits.OnesCount64((queenSideSqBitboard | board.bitboards[BK]) & ^Unsafe) == 3) && (
+		bits.OnesCount64(Empty & (queenSideSqBitboard | 1 << (kingIdx - 3))) == 3) {
 		moveList.AddMove(GetMoveInt(4, 2, 0, 0, MoveFlagCastle))
 	}
 }
