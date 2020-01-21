@@ -11,12 +11,12 @@ func TestPossibleMovesWhite(t *testing.T) {
 	// board.ParseStringArray(StartingPosition)
 	board.ParseStringArray([8][8]string{
 		[8]string{"r", "n", "b", "q", "k", "b", "n", "r"},
-		[8]string{"p", "p", "p", "p", "p", "p", "p", "p"},
+		[8]string{"p", " ", "p", "p", "p", "p", "p", "p"},
+		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+		[8]string{"P", "p", " ", " ", " ", " ", " ", " "},
 		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
 		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
-		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
-		[8]string{" ", "p", " ", " ", " ", " ", " ", " "},
-		[8]string{"P", "P", "P", "P", "P", "P", "P", "P"},
+		[8]string{" ", "P", "P", "P", "P", "P", "P", "P"},
 		[8]string{"R", "N", "B", "Q", "K", "B", "N", "R"}})
 
 	// enabl all files on enpassant bitboard
@@ -27,7 +27,7 @@ func TestPossibleMovesWhite(t *testing.T) {
 	board.PossibleMovesWhite(&moveList)
 	// board.PossibleMovesBlack(&moveList)
 	PrintMoveList(&moveList)
-	board.MakeMove(moveList.Moves[0].Move)
+	board.MakeMove(moveList.Moves[15].Move)
 	// moveList := board.PossibleMovesBlack()
 
 	// fmt.Println(len(moveList) / 4)
