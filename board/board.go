@@ -34,6 +34,13 @@ const (
 	EP // en passant file bitboard
 )
 
+// Defines for colours
+const (
+	White int = iota
+	Black
+	Both
+)
+
 // Defines for castling rights
 // The values are such that they each represent a bit from a 4 bit int value
 // for example if white can castle kingside and black can castle queenside
@@ -48,7 +55,10 @@ const (
 // Board Struct to represent the chess board
 type Board struct {
 	bitboards         [13]uint64
+	Side              int
 	castlePermissions int
+	fiftyMove         int  // how many moves from the fifty move rule have been made
+
 }
 
 // ParseStringArray Parses a 8x8 string array that represents a

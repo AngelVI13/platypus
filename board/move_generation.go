@@ -47,11 +47,11 @@ func (board *Board) PossibleMovesWhite(moveList *MoveList) {
 	Unsafe = board.unsafeForWhite()
 
 	board.possibleWhitePawn(moveList)
-	board.possibleKnightMoves(moveList, board.bitboards[WN])
-	board.possibleBishopMoves(moveList, board.bitboards[WB])
-	board.possibleRookMoves(moveList, board.bitboards[WR])
-	board.possibleQueenMoves(moveList, board.bitboards[WQ])
-	board.possibleKingMoves(moveList, board.bitboards[WK])
+	board.possibleKnightMoves(moveList, board.bitboards[WN], WN)
+	board.possibleBishopMoves(moveList, board.bitboards[WB], WB)
+	board.possibleRookMoves(moveList, board.bitboards[WR], WR)
+	board.possibleQueenMoves(moveList, board.bitboards[WQ], WQ)
+	board.possibleKingMoves(moveList, board.bitboards[WK], WK)
 	board.possibleCastleWhite(moveList)
 }
 
@@ -98,11 +98,11 @@ func (board *Board) PossibleMovesBlack(moveList *MoveList) {
 	Unsafe = board.unsafeForBlack()
 
 	board.possibleBlackPawn(moveList)
-	board.possibleKnightMoves(moveList, board.bitboards[BN])
-	board.possibleBishopMoves(moveList, board.bitboards[BB])
-	board.possibleRookMoves(moveList, board.bitboards[BR])
-	board.possibleQueenMoves(moveList, board.bitboards[BQ])
-	board.possibleKingMoves(moveList, board.bitboards[BK])
+	board.possibleKnightMoves(moveList, board.bitboards[BN], BN)
+	board.possibleBishopMoves(moveList, board.bitboards[BB], BB)
+	board.possibleRookMoves(moveList, board.bitboards[BR], BR)
+	board.possibleQueenMoves(moveList, board.bitboards[BQ], BQ)
+	board.possibleKingMoves(moveList, board.bitboards[BK], BK)
 	board.possibleCastleBlack(moveList)
 }
 
@@ -156,7 +156,7 @@ func (board *Board) possibleWhitePawn(moveList *MoveList) {
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index+7, index, 0, 0, MoveFlagCapture))
+		moveList.AddMove(GetMoveInt(index+7, index, WP, 0, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -165,7 +165,7 @@ func (board *Board) possibleWhitePawn(moveList *MoveList) {
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index+9, index, 0, 0, MoveFlagCapture))
+		moveList.AddMove(GetMoveInt(index+9, index, WP, 0, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -174,7 +174,7 @@ func (board *Board) possibleWhitePawn(moveList *MoveList) {
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index+8, index, 0, 0, NoFlag))
+		moveList.AddMove(GetMoveInt(index+8, index, WP, 0, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -186,7 +186,7 @@ func (board *Board) possibleWhitePawn(moveList *MoveList) {
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index+16, index, 0, 0, MoveFlagPawnStart))
+		moveList.AddMove(GetMoveInt(index+16, index, WP, 0, MoveFlagPawnStart))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -197,10 +197,10 @@ func (board *Board) possibleWhitePawn(moveList *MoveList) {
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		// todo maybe Capture flag??
-		moveList.AddMove(GetMoveInt(index+7, index, 0, WQ, NoFlag))
-		moveList.AddMove(GetMoveInt(index+7, index, 0, WR, NoFlag))
-		moveList.AddMove(GetMoveInt(index+7, index, 0, WB, NoFlag))
-		moveList.AddMove(GetMoveInt(index+7, index, 0, WN, NoFlag))
+		moveList.AddMove(GetMoveInt(index+7, index, WP, WQ, NoFlag))
+		moveList.AddMove(GetMoveInt(index+7, index, WP, WR, NoFlag))
+		moveList.AddMove(GetMoveInt(index+7, index, WP, WB, NoFlag))
+		moveList.AddMove(GetMoveInt(index+7, index, WP, WN, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -210,10 +210,10 @@ func (board *Board) possibleWhitePawn(moveList *MoveList) {
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		// todo maybe Capture flag??
-		moveList.AddMove(GetMoveInt(index+9, index, 0, WQ, NoFlag))
-		moveList.AddMove(GetMoveInt(index+9, index, 0, WR, NoFlag))
-		moveList.AddMove(GetMoveInt(index+9, index, 0, WB, NoFlag))
-		moveList.AddMove(GetMoveInt(index+9, index, 0, WN, NoFlag))
+		moveList.AddMove(GetMoveInt(index+9, index, WP, WQ, NoFlag))
+		moveList.AddMove(GetMoveInt(index+9, index, WP, WR, NoFlag))
+		moveList.AddMove(GetMoveInt(index+9, index, WP, WB, NoFlag))
+		moveList.AddMove(GetMoveInt(index+9, index, WP, WN, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -222,10 +222,10 @@ func (board *Board) possibleWhitePawn(moveList *MoveList) {
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index+8, index, 0, WQ, NoFlag))
-		moveList.AddMove(GetMoveInt(index+8, index, 0, WR, NoFlag))
-		moveList.AddMove(GetMoveInt(index+8, index, 0, WB, NoFlag))
-		moveList.AddMove(GetMoveInt(index+8, index, 0, WN, NoFlag))
+		moveList.AddMove(GetMoveInt(index+8, index, WP, WQ, NoFlag))
+		moveList.AddMove(GetMoveInt(index+8, index, WP, WR, NoFlag))
+		moveList.AddMove(GetMoveInt(index+8, index, WP, WB, NoFlag))
+		moveList.AddMove(GetMoveInt(index+8, index, WP, WN, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -234,13 +234,13 @@ func (board *Board) possibleWhitePawn(moveList *MoveList) {
 	possibility = (wp << 1) & board.bitboards[BP] & Rank5 & (^FileA) & board.bitboards[EP]
 	if possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index-1, index-8, 0, 0, MoveFlagEnPass))
+		moveList.AddMove(GetMoveInt(index-1, index-8, WP, 0, MoveFlagEnPass))
 	}
 	// en passant left
 	possibility = (wp >> 1) & board.bitboards[BP] & Rank5 & (^FileH) & board.bitboards[EP]
 	if possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index+1, index-8, 0, 0, MoveFlagEnPass))
+		moveList.AddMove(GetMoveInt(index+1, index-8, WP, 0, MoveFlagEnPass))
 	}
 }
 
@@ -256,7 +256,7 @@ func (board *Board) possibleBlackPawn(moveList *MoveList) {
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index-7, index, 0, 0, MoveFlagCapture))
+		moveList.AddMove(GetMoveInt(index-7, index, BP, 0, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -265,7 +265,7 @@ func (board *Board) possibleBlackPawn(moveList *MoveList) {
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index-9, index, 0, 0, MoveFlagCapture))
+		moveList.AddMove(GetMoveInt(index-9, index, BP, 0, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -274,7 +274,7 @@ func (board *Board) possibleBlackPawn(moveList *MoveList) {
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index-8, index, 0, 0, NoFlag))
+		moveList.AddMove(GetMoveInt(index-8, index, BP, 0, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -286,7 +286,7 @@ func (board *Board) possibleBlackPawn(moveList *MoveList) {
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index-16, index, 0, 0, MoveFlagPawnStart))
+		moveList.AddMove(GetMoveInt(index-16, index, BP, 0, MoveFlagPawnStart))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -297,10 +297,10 @@ func (board *Board) possibleBlackPawn(moveList *MoveList) {
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		// todo maybe Capture flag??
-		moveList.AddMove(GetMoveInt(index-7, index, 0, BQ, NoFlag))
-		moveList.AddMove(GetMoveInt(index-7, index, 0, BR, NoFlag))
-		moveList.AddMove(GetMoveInt(index-7, index, 0, BB, NoFlag))
-		moveList.AddMove(GetMoveInt(index-7, index, 0, BN, NoFlag))
+		moveList.AddMove(GetMoveInt(index-7, index, BP, BQ, NoFlag))
+		moveList.AddMove(GetMoveInt(index-7, index, BP, BR, NoFlag))
+		moveList.AddMove(GetMoveInt(index-7, index, BP, BB, NoFlag))
+		moveList.AddMove(GetMoveInt(index-7, index, BP, BN, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -310,10 +310,10 @@ func (board *Board) possibleBlackPawn(moveList *MoveList) {
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		// todo maybe Capture flag??
-		moveList.AddMove(GetMoveInt(index-9, index, 0, BQ, NoFlag))
-		moveList.AddMove(GetMoveInt(index-9, index, 0, BR, NoFlag))
-		moveList.AddMove(GetMoveInt(index-9, index, 0, BB, NoFlag))
-		moveList.AddMove(GetMoveInt(index-9, index, 0, BN, NoFlag))
+		moveList.AddMove(GetMoveInt(index-9, index, BP, BQ, NoFlag))
+		moveList.AddMove(GetMoveInt(index-9, index, BP, BR, NoFlag))
+		moveList.AddMove(GetMoveInt(index-9, index, BP, BB, NoFlag))
+		moveList.AddMove(GetMoveInt(index-9, index, BP, BN, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -322,10 +322,10 @@ func (board *Board) possibleBlackPawn(moveList *MoveList) {
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index-8, index, 0, BQ, NoFlag))
-		moveList.AddMove(GetMoveInt(index-8, index, 0, BR, NoFlag))
-		moveList.AddMove(GetMoveInt(index-8, index, 0, BB, NoFlag))
-		moveList.AddMove(GetMoveInt(index-8, index, 0, BN, NoFlag))
+		moveList.AddMove(GetMoveInt(index-8, index, BP, BQ, NoFlag))
+		moveList.AddMove(GetMoveInt(index-8, index, BP, BR, NoFlag))
+		moveList.AddMove(GetMoveInt(index-8, index, BP, BB, NoFlag))
+		moveList.AddMove(GetMoveInt(index-8, index, BP, BN, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -334,17 +334,17 @@ func (board *Board) possibleBlackPawn(moveList *MoveList) {
 	possibility = (bp >> 1) & board.bitboards[WP] & Rank4 & (^FileH) & board.bitboards[EP]
 	if possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index+1, index+8, 0, 0, MoveFlagEnPass))
+		moveList.AddMove(GetMoveInt(index+1, index+8, BP, 0, MoveFlagEnPass))
 	}
 	// en passant left
 	possibility = (bp << 1) & board.bitboards[WP] & Rank4 & (^FileA) & board.bitboards[EP]
 	if possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index-1, index+8, 0, 0, MoveFlagEnPass))
+		moveList.AddMove(GetMoveInt(index-1, index+8, BP, 0, MoveFlagEnPass))
 	}
 }
 
-func (board *Board) possibleKnightMoves(moveList *MoveList, knight uint64) {
+func (board *Board) possibleKnightMoves(moveList *MoveList, knight uint64, pieceType int) {
 	// Choose bishop
 	knightPossibility := knight & (^(knight - 1))
 	var possibility uint64
@@ -381,7 +381,7 @@ func (board *Board) possibleKnightMoves(moveList *MoveList, knight uint64) {
 		for movePossibility != 0 {
 			// possible move index (in bitmask)
 			moveIndex := bits.TrailingZeros64(movePossibility)
-			moveList.AddMove(GetMoveInt(knightIdx, moveIndex, 0, 0, NoFlag))
+			moveList.AddMove(GetMoveInt(knightIdx, moveIndex, pieceType, 0, NoFlag))
 			possibility &= ^movePossibility                      // remove move from all possible moves
 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
 		}
@@ -390,7 +390,7 @@ func (board *Board) possibleKnightMoves(moveList *MoveList, knight uint64) {
 	}
 }
 
-func (board *Board) possibleBishopMoves(moveList *MoveList, bishop uint64) {
+func (board *Board) possibleBishopMoves(moveList *MoveList, bishop uint64, pieceType int) {
 	// Choose bishop
 	bishopPossibility := bishop & (^(bishop - 1))
 	var possibility uint64
@@ -405,7 +405,7 @@ func (board *Board) possibleBishopMoves(moveList *MoveList, bishop uint64) {
 		for movePossibility != 0 {
 			// possible move index (in bitmask)
 			moveIndex := bits.TrailingZeros64(movePossibility)
-			moveList.AddMove(GetMoveInt(bishopIdx, moveIndex, 0, 0, NoFlag))
+			moveList.AddMove(GetMoveInt(bishopIdx, moveIndex, pieceType, 0, NoFlag))
 			possibility &= ^movePossibility                      // remove move from all possible moves
 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
 		}
@@ -414,7 +414,7 @@ func (board *Board) possibleBishopMoves(moveList *MoveList, bishop uint64) {
 	}
 }
 
-func (board *Board) possibleRookMoves(moveList *MoveList, rook uint64) {
+func (board *Board) possibleRookMoves(moveList *MoveList, rook uint64, pieceType int) {
 	// Choose rook
 	rookPossibility := rook & (^(rook - 1))
 	var possibility uint64
@@ -429,7 +429,7 @@ func (board *Board) possibleRookMoves(moveList *MoveList, rook uint64) {
 		for movePossibility != 0 {
 			// possible move index (in bitmask)
 			moveIndex := bits.TrailingZeros64(movePossibility)
-			moveList.AddMove(GetMoveInt(rookIdx, moveIndex, 0, 0, NoFlag))
+			moveList.AddMove(GetMoveInt(rookIdx, moveIndex, pieceType, 0, NoFlag))
 			possibility &= ^movePossibility                      // remove move from all possible moves
 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
 		}
@@ -438,7 +438,7 @@ func (board *Board) possibleRookMoves(moveList *MoveList, rook uint64) {
 	}
 }
 
-func (board *Board) possibleQueenMoves(moveList *MoveList, queen uint64) {
+func (board *Board) possibleQueenMoves(moveList *MoveList, queen uint64, pieceType int) {
 	// Choose queen
 	queenPossibility := queen & (^(queen - 1))
 	var possibility uint64
@@ -453,7 +453,7 @@ func (board *Board) possibleQueenMoves(moveList *MoveList, queen uint64) {
 		for movePossibility != 0 {
 			// possible move index (in bitmask)
 			moveIndex := bits.TrailingZeros64(movePossibility)
-			moveList.AddMove(GetMoveInt(queenIdx, moveIndex, 0, 0, NoFlag))
+			moveList.AddMove(GetMoveInt(queenIdx, moveIndex, pieceType, 0, NoFlag))
 			possibility &= ^movePossibility                      // remove move from all possible moves
 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
 		}
@@ -462,7 +462,7 @@ func (board *Board) possibleQueenMoves(moveList *MoveList, queen uint64) {
 	}
 }
 
-func (board *Board) possibleKingMoves(moveList *MoveList, king uint64) {
+func (board *Board) possibleKingMoves(moveList *MoveList, king uint64, pieceType int) {
 	var possibility uint64
 
 	// Current king index (in bitmask)
@@ -486,7 +486,7 @@ func (board *Board) possibleKingMoves(moveList *MoveList, king uint64) {
 	for movePossibility != 0 {
 		// possible move index (in bitmask)
 		moveIndex := bits.TrailingZeros64(movePossibility)
-		moveList.AddMove(GetMoveInt(kingIdx, moveIndex, 0, 0, NoFlag))
+		moveList.AddMove(GetMoveInt(kingIdx, moveIndex, pieceType, 0, NoFlag))
 		possibility &= ^movePossibility                      // remove move from all possible moves
 		movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
 	}
@@ -500,12 +500,12 @@ func (board *Board) possibleCastleWhite(moveList *MoveList) {
 	if (board.castlePermissions&WhiteKingCastling) != 0 && (((1 << CastleRooks[0]) & board.bitboards[WR]) != 0) && (
 		bits.OnesCount64((kingSideSqBitboard | board.bitboards[WK]) & ^Unsafe) == 3) && (
 		bits.OnesCount64(Empty & kingSideSqBitboard) == 2) {
-		moveList.AddMove(GetMoveInt(60, 62, 0, 0, MoveFlagCastle))
+		moveList.AddMove(GetMoveInt(60, 62, WK, 0, MoveFlagCastle))
 	}
 	if (board.castlePermissions&WhiteQueenCastling) != 0 && (((1 << CastleRooks[1]) & board.bitboards[WR]) != 0) && (
 		bits.OnesCount64((queenSideSqBitboard | board.bitboards[WK]) & ^Unsafe) == 3) && (
 		bits.OnesCount64(Empty & (queenSideSqBitboard | 1 << (kingIdx - 3))) == 3) {  // on the queen side there are 3 sq that should be empty to enable castling
-		moveList.AddMove(GetMoveInt(60, 58, 0, 0, MoveFlagCastle))
+		moveList.AddMove(GetMoveInt(60, 58, WK, 0, MoveFlagCastle))
 	}
 }
 
@@ -517,12 +517,12 @@ func (board *Board) possibleCastleBlack(moveList *MoveList) {
 	if (board.castlePermissions&BlackKingCastling) != 0 && (((1 << CastleRooks[2]) & board.bitboards[BR]) != 0) && (
 		bits.OnesCount64((kingSideSqBitboard | board.bitboards[BK]) & ^Unsafe) == 3) && (
 		bits.OnesCount64(Empty & kingSideSqBitboard) == 2) {
-		moveList.AddMove(GetMoveInt(4, 6, 0, 0, MoveFlagCastle))
+		moveList.AddMove(GetMoveInt(4, 6, BK, 0, MoveFlagCastle))
 	}
 	if (board.castlePermissions&BlackQueenCastling) != 0 && (((1 << CastleRooks[3]) & board.bitboards[BR]) != 0) && (
 		bits.OnesCount64((queenSideSqBitboard | board.bitboards[BK]) & ^Unsafe) == 3) && (
 		bits.OnesCount64(Empty & (queenSideSqBitboard | 1 << (kingIdx - 3))) == 3) {
-		moveList.AddMove(GetMoveInt(4, 2, 0, 0, MoveFlagCastle))
+		moveList.AddMove(GetMoveInt(4, 2, BK, 0, MoveFlagCastle))
 	}
 }
 

@@ -121,7 +121,7 @@ type Move struct {
                |Ca| |--To-||-From-|
 0000 0000 0000 0000 0000 0011 1111 -> From - 0x3F
 0000 0000 0000 0000 1111 1100 0000 -> To - >> 6, 0x3F
-0000 0000 0000 1111 0000 0000 0000 -> Captured - >> 12, 0xF
+0000 0000 0000 1111 0000 0000 0000 -> Piece Type - >> 12, 0xF
 0000 0000 0001 0000 0000 0000 0000 -> En passant capt - >> 16 - 0x40000
 0000 0000 0010 0000 0000 0000 0000 -> PawnStart - >> 17 - 0x80000
 0000 0011 1100 0000 0000 0000 0000 -> Promotion to what piece - >> 18, 0xF
@@ -138,8 +138,8 @@ func ToSq(m int) int {
 	return (m >> 6) & 0x3f
 }
 
-// Captured - macro that returns the 'Captured' bits from the move int
-func Captured(m int) int {
+// PieceType - macro that returns the 'PieceType' bits from the move int
+func PieceType(m int) int {
 	return (m >> 12) & 0xf
 }
 
@@ -164,8 +164,8 @@ func CastleFlag(m int) int {
 }
 
 // GetMoveInt creates and returns a move int from given move information
-func GetMoveInt(fromSq, toSq, capturePiece, promotionPiece, flag int) int {
-	return fromSq | (toSq << 6) | (capturePiece << 12) | (promotionPiece << 18) | flag
+func GetMoveInt(fromSq, toSq, pieceType, promotionPiece, flag int) int {
+	return fromSq | (toSq << 6) | (pieceType << 12) | (promotionPiece << 18) | flag
 }
 
 const (
@@ -174,9 +174,6 @@ const (
 
 	// MoveFlagPawnStart move flag that denotes if move was pawn start (2x)
 	MoveFlagPawnStart int = 0x20000
-
-	// MoveFlagCapture move flag that denotes if move was capture without saying what the capture was (checks capture & enpas squares)
-	MoveFlagCapture int = 0xF000
 
 	// NoFlag constant that denotes no flag is applied to move
 	NoFlag int = 0

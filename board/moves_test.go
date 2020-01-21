@@ -15,7 +15,7 @@ func TestPossibleMovesWhite(t *testing.T) {
 		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
 		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
 		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
-		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+		[8]string{" ", "p", " ", " ", " ", " ", " ", " "},
 		[8]string{"P", "P", "P", "P", "P", "P", "P", "P"},
 		[8]string{"R", "N", "B", "Q", "K", "B", "N", "R"}})
 
@@ -27,6 +27,7 @@ func TestPossibleMovesWhite(t *testing.T) {
 	board.PossibleMovesWhite(&moveList)
 	// board.PossibleMovesBlack(&moveList)
 	PrintMoveList(&moveList)
+	board.MakeMove(moveList.Moves[0].Move)
 	// moveList := board.PossibleMovesBlack()
 
 	// fmt.Println(len(moveList) / 4)
@@ -93,8 +94,8 @@ func TestGetMoveIntPawnStart(t *testing.T) {
 	if Promoted(move) != WQ {
 		t.Error("Wrong PROMOTED piece")
 	}
-	if Captured(move) != WP {
-		t.Error("Wrong CAPTURED square")
+	if PieceType(move) != WP {
+		t.Error("Wrong PIECE_TYPE square")
 	}
 	if EnPassantFlag(move) != 0 {
 		t.Error("Wrong EN_PASSANT_FLAG square")
@@ -120,8 +121,8 @@ func TestGetMoveIntCastle(t *testing.T) {
 	if Promoted(move) != WN {
 		t.Error("Wrong PROMOTED piece")
 	}
-	if Captured(move) != WR {
-		t.Error("Wrong CAPTURED square")
+	if PieceType(move) != WR {
+		t.Error("Wrong PIECE_TYPE square")
 	}
 	if EnPassantFlag(move) != 0 {
 		t.Error("Wrong EN_PASSANT_FLAG square")
@@ -147,8 +148,8 @@ func TestGetMoveIntEnPassant(t *testing.T) {
 	if Promoted(move) != WR {
 		t.Error("Wrong PROMOTED piece")
 	}
-	if Captured(move) != WB {
-		t.Error("Wrong CAPTURED square")
+	if PieceType(move) != WB {
+		t.Error("Wrong PIECE_TYPE square")
 	}
 	if EnPassantFlag(move) != 1 {
 		t.Error("Wrong EN_PASSANT_FLAG square")
