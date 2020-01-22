@@ -92,6 +92,21 @@ var AntiDiagonalMasks8 [15]uint64 = [15]uint64{
 // CastleRooks Array containing all initial rook squares
 var CastleRooks [4]int = [4]int{63, 56, 7, 0}
 
+const (
+	H1 int = 63
+	A1 int = 56
+	A8 int = 0
+	H8 int = 7
+	D1 int = 59
+	F1 int = 61
+	D8 int = 3
+	F8 int = 5
+	G1 int = 62
+	C1 int = 58
+	C8 int = 2
+	G8 int = 6
+)
+
 // NotMyPieces bitboard with all enemy and empty squares
 // TODO These should be in a struct (board?)
 var NotMyPieces uint64

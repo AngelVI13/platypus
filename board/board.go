@@ -41,6 +41,24 @@ const (
 	Both
 )
 
+// CastlePerm used to simplify hashing castle permissions
+// Everytime we make a move we will take pos.castlePerm &= CastlePerm[sq]
+// in this way if any of the rooks or the king moves, the castle permission will be
+// disabled for that side. In any other move, the castle permissions will remain the
+// same, since 15 is the max number associated with all possible castling permissions
+// for both sides
+var CastlePerm = [64]int{
+	7,  15, 15, 15,  3, 15, 15, 11,
+	15, 15, 15, 15, 15, 15, 15, 15,
+	15, 15, 15, 15, 15, 15, 15, 15,
+	15, 15, 15, 15, 15, 15, 15, 15,
+	15, 15, 15, 15, 15, 15, 15, 15,
+	15, 15, 15, 15, 15, 15, 15, 15,
+	15, 15, 15, 15, 15, 15, 15, 15,
+	13, 15, 15, 15, 12, 15, 15, 14,
+}
+
+
 // Defines for castling rights
 // The values are such that they each represent a bit from a 4 bit int value
 // for example if white can castle kingside and black can castle queenside

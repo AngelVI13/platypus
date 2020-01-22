@@ -497,12 +497,13 @@ func (board *Board) possibleCastleWhite(moveList *MoveList) {
 	var queenSideSqBitboard uint64 = 1 << (kingIdx - 1) | 1 << (kingIdx - 2)
 	var kingSideSqBitboard uint64 = 1 << (kingIdx + 1) | 1 << (kingIdx + 2)
 
-	if (board.castlePermissions&WhiteKingCastling) != 0 && (((1 << CastleRooks[0]) & board.bitboards[WR]) != 0) && (
+	// todo replace hardcoded squares with consts
+	if (board.castlePermissions&WhiteKingCastling) != 0 && (
 		bits.OnesCount64((kingSideSqBitboard | board.bitboards[WK]) & ^Unsafe) == 3) && (
 		bits.OnesCount64(Empty & kingSideSqBitboard) == 2) {
 		moveList.AddMove(GetMoveInt(60, 62, WK, 0, MoveFlagCastle))
 	}
-	if (board.castlePermissions&WhiteQueenCastling) != 0 && (((1 << CastleRooks[1]) & board.bitboards[WR]) != 0) && (
+	if (board.castlePermissions&WhiteQueenCastling) != 0 && (
 		bits.OnesCount64((queenSideSqBitboard | board.bitboards[WK]) & ^Unsafe) == 3) && (
 		bits.OnesCount64(Empty & (queenSideSqBitboard | 1 << (kingIdx - 3))) == 3) {  // on the queen side there are 3 sq that should be empty to enable castling
 		moveList.AddMove(GetMoveInt(60, 58, WK, 0, MoveFlagCastle))
@@ -514,12 +515,12 @@ func (board *Board) possibleCastleBlack(moveList *MoveList) {
 	var queenSideSqBitboard uint64 = 1 << (kingIdx - 1) | 1 << (kingIdx - 2)
 	var kingSideSqBitboard uint64 = 1 << (kingIdx + 1) | 1 << (kingIdx + 2)
 
-	if (board.castlePermissions&BlackKingCastling) != 0 && (((1 << CastleRooks[2]) & board.bitboards[BR]) != 0) && (
+	if (board.castlePermissions&BlackKingCastling) != 0 && (
 		bits.OnesCount64((kingSideSqBitboard | board.bitboards[BK]) & ^Unsafe) == 3) && (
 		bits.OnesCount64(Empty & kingSideSqBitboard) == 2) {
 		moveList.AddMove(GetMoveInt(4, 6, BK, 0, MoveFlagCastle))
 	}
-	if (board.castlePermissions&BlackQueenCastling) != 0 && (((1 << CastleRooks[3]) & board.bitboards[BR]) != 0) && (
+	if (board.castlePermissions&BlackQueenCastling) != 0 && (
 		bits.OnesCount64((queenSideSqBitboard | board.bitboards[BK]) & ^Unsafe) == 3) && (
 		bits.OnesCount64(Empty & (queenSideSqBitboard | 1 << (kingIdx - 3))) == 3) {
 		moveList.AddMove(GetMoveInt(4, 2, BK, 0, MoveFlagCastle))
