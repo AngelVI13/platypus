@@ -1,8 +1,8 @@
 package board
 
-import (
-	"fmt"
-)
+// import (
+// 	"fmt"
+// )
 
 func (board *Board) removePieceFromSq(pieceType, sq int) {
 	board.bitboards[pieceType] &= (^(1 << sq))
@@ -13,8 +13,8 @@ func (board *Board) addPieceToSq(pieceType, sq int) {
 }
 
 // MakeMove makes a move
-func (board *Board) MakeMove(move int) {
-	fmt.Println("make move")
+func (board *Board) MakeMove(move int) bool {
+	// fmt.Println("make move")
 	fromSq := FromSq(move)
 	toSq := ToSq(move)
 	pieceType := PieceType(move)
@@ -25,6 +25,8 @@ func (board *Board) MakeMove(move int) {
 	board.addPieceToSq(pieceType, toSq)
 
 	if CastleFlag(move) == 1 {
+		PerftCastles++
+
 		if pieceType == WK && toSq == G1 {
 			board.removePieceFromSq(WR, H1)
 			board.addPieceToSq(WR, F1)
@@ -51,6 +53,7 @@ func (board *Board) MakeMove(move int) {
 	// if ToSq is occupied by one of enemy's pieces -> it was a capture
 	if (EnemyPieces >> toSq) & 1 == 1 {
 		board.fiftyMove = 0  // reset 50 move rule counter
+		PerftCaptures++
 
 		for i := WP; i <= BK; i++ {
 			// if destination square is on the board -> must be the correct board for the capture
@@ -61,6 +64,7 @@ func (board *Board) MakeMove(move int) {
 			}
 		}
 	} else if ((Empty >> toSq) & 1 == 1) && (EnPassantFlag(move) == 1) {
+		PerftEnPassant++
 		// Otherwise if destination piece is empty but the move is enpassant -> remove captured piece
 		if board.Side == White {
 			board.removePieceFromSq(BP, toSq + 8)
@@ -81,6 +85,7 @@ func (board *Board) MakeMove(move int) {
 	}
 
 	if promoted := Promoted(move); promoted > 0 {
+		PerftPromotions++
 		// todo update material here
 		board.addPieceToSq(promoted, toSq)
 	}
@@ -90,8 +95,10 @@ func (board *Board) MakeMove(move int) {
 	var kingBoard int
 	if board.Side == White {
 		kingBoard = WK
+		Unsafe = board.unsafeForWhite()
 	} else {
 		kingBoard = BK
+		Unsafe = board.unsafeForBlack()
 	}
 
 	board.Side ^= 1  // change side to move
@@ -99,7 +106,10 @@ func (board *Board) MakeMove(move int) {
 	//! Move this code to the top so that we won't have to undo that much if a move is illegal
 	//! for example we only need to have -> add/remove piece (including capture, enpassant, promotions) before the check for a check
 	if (board.bitboards[kingBoard] & Unsafe) != 0 {
-		fmt.Println("Illegal move")
+		// fmt.Println("Illegal move")
+		return false
 		// todo take back all changes
 	}
+
+	return true
 }
