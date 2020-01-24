@@ -111,9 +111,6 @@ const (
 // TODO These should be in a struct (board?)
 var NotMyPieces uint64
 
-// MyPieces bitboard with all of the squares of my pieces
-var MyPieces uint64
-
 // EnemyPieces bitboard with all the squares of enemy pieces
 var EnemyPieces uint64
 

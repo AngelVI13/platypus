@@ -74,12 +74,6 @@ func (board *Board) PossibleMovesBlack(moveList *MoveList) {
 		board.bitboards[WR] |
 		board.bitboards[WQ])
 
-	MyPieces = (board.bitboards[BP] |
-		board.bitboards[BN] |
-		board.bitboards[BB] |
-		board.bitboards[BR] |
-		board.bitboards[BQ])
-
 	Occupied = (board.bitboards[WP] |
 		board.bitboards[WN] |
 		board.bitboards[WB] |
@@ -95,7 +89,7 @@ func (board *Board) PossibleMovesBlack(moveList *MoveList) {
 
 	Empty = ^Occupied
 
-	Unsafe = board.unsafeForBlack()
+	Unsafe = board.unsafeForBlack()  // move this only to make move, castling shuold not check for checks
 
 	board.possibleBlackPawn(moveList)
 	board.possibleKnightMoves(moveList, board.bitboards[BN], BN)
