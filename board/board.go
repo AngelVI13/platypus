@@ -79,6 +79,16 @@ type Board struct {
 
 }
 
+// Reset Resets current board
+func (board *Board) Reset() {
+	for i :=0; i < 13; i++ {
+		board.bitboards[i] = uint64(0)
+	}
+	board.Side = White
+	board.castlePermissions = 0
+	board.fiftyMove = 0
+}
+
 // ParseStringArray Parses a 8x8 string array that represents a
 // board position in human form to 12 bitboards
 func (board *Board) ParseStringArray(position [8][8]string) {

@@ -1,7 +1,7 @@
 package board
 
 
-// import ("fmt")
+import ("fmt")
 
 var PerftMoveCounter int
 var PerftMaxDepth int
@@ -32,7 +32,7 @@ func Perft(board Board, depth int) {
 				continue
 			}
 
-			// fmt.Printf("Made move %s\nBoard is:\n%s\n\n", GetMoveString(move), &moveBoard)
+			fmt.Printf("Made move %s\nBoard is:\n%s\n\n", GetMoveString(move), &moveBoard)
 			if (depth + 1) == PerftMaxDepth {
 				PerftMoveCounter++
 			}
