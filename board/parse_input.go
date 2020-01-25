@@ -1,6 +1,5 @@
 package board
 
-
 import (
 	"fmt"
 	"strconv"
@@ -59,7 +58,6 @@ func (board *Board) ParseFen(fen string) {
 	char++ // move char from empty space to the w/b part of FEN
 	// newChar should be set to the side to move part of the FEN string here
 	newChar = string(fen[char])
-	fmt.Printf("NewChar: %s\n", newChar)
 	if newChar == "w" {
 		board.Side = White
 	} else if newChar == "b" {
@@ -102,7 +100,7 @@ func (board *Board) ParseFen(fen string) {
 		file := newChar[0] - "a"[0]
 		char++
 
-		if (file < 0 || file > 7) {
+		if file < 0 || file > 7 {
 			panic(fmt.Sprintf("File out of bounds: file(%d)", file))
 		}
 

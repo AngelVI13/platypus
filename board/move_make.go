@@ -1,9 +1,5 @@
 package board
 
-// import (
-// 	"fmt"
-// )
-
 func (board *Board) removePieceFromSq(pieceType, sq int) {
 	board.bitboards[pieceType] &= (^(1 << sq))
 }
@@ -14,7 +10,6 @@ func (board *Board) addPieceToSq(pieceType, sq int) {
 
 // MakeMove makes a move
 func (board *Board) MakeMove(move int) bool {
-	// fmt.Println("make move")
 	fromSq := FromSq(move)
 	toSq := ToSq(move)
 	pieceType := PieceType(move)
@@ -51,25 +46,37 @@ func (board *Board) MakeMove(move int) bool {
 	// todo Or store this bitboard in history and in current board
 
 	// if ToSq is occupied by one of enemy's pieces -> it was a capture
-	if (EnemyPieces >> toSq) & 1 == 1 {
-		board.fiftyMove = 0  // reset 50 move rule counter
+	if (EnemyPieces>>toSq)&1 == 1 {
+		board.fiftyMove = 0 // reset 50 move rule counter
 		PerftCaptures++
 
-		for i := WP; i <= BK; i++ {
+		// todo this should be done only once for the current board state NOT on every makemove
+		var startRange int
+		var endRange int
+		if board.Side == White {
+			// if current side is white the we capture from blacks pieces
+			startRange = BP
+			endRange = BK
+		} else {
+			startRange = WP
+			endRange = WK
+		}
+
+		for i := startRange; i <= endRange; i++ {
 			// if destination square is on the board -> must be the correct board for the capture
-			if (board.bitboards[i] >> toSq) & 1 == 1 {
+			if (board.bitboards[i]>>toSq)&1 == 1 {
 				// todo update material here
-				board.removePieceFromSq(i, toSq)  // remove enemy piece from its board
+				board.removePieceFromSq(i, toSq) // remove enemy piece from its board
 				break
 			}
 		}
-	} else if ((Empty >> toSq) & 1 == 1) && (EnPassantFlag(move) == 1) {
+	} else if ((Empty>>toSq)&1 == 1) && (EnPassantFlag(move) == 1) {
 		PerftEnPassant++
 		// Otherwise if destination piece is empty but the move is enpassant -> remove captured piece
 		if board.Side == White {
-			board.removePieceFromSq(BP, toSq + 8)
+			board.removePieceFromSq(BP, toSq+8)
 		} else {
-			board.removePieceFromSq(WP, toSq - 8)
+			board.removePieceFromSq(WP, toSq-8)
 		}
 	}
 
@@ -81,7 +88,7 @@ func (board *Board) MakeMove(move int) bool {
 
 	// if a pawn start -> update EnPassant bitboard
 	if PawnStartFlag(move) == 1 {
-		board.bitboards[EP] = FileMasks8[toSq % 8]
+		board.bitboards[EP] = FileMasks8[toSq%8]
 	}
 
 	if promoted := Promoted(move); promoted > 0 {
@@ -101,12 +108,11 @@ func (board *Board) MakeMove(move int) bool {
 		Unsafe = board.unsafeForBlack()
 	}
 
-	board.Side ^= 1  // change side to move
+	board.Side ^= 1 // change side to move
 
 	//! Move this code to the top so that we won't have to undo that much if a move is illegal
 	//! for example we only need to have -> add/remove piece (including capture, enpassant, promotions) before the check for a check
 	if (board.bitboards[kingBoard] & Unsafe) != 0 {
-		// fmt.Println("Illegal move")
 		return false
 		// todo take back all changes
 	}

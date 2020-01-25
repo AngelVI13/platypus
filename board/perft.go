@@ -1,15 +1,11 @@
 package board
 
-
-import ("fmt")
-
 var PerftMoveCounter int
 var PerftMaxDepth int
 var PerftCaptures int
 var PerftCastles int
 var PerftEnPassant int
 var PerftPromotions int
-
 
 func Perft(board Board, depth int) {
 	if depth < PerftMaxDepth {
@@ -24,7 +20,7 @@ func Perft(board Board, depth int) {
 
 		for i := 0; i < moveList.Count; i++ {
 			move := moveList.Moves[i].Move
-			moveBoard := board  // copy board
+			moveBoard := board // copy board
 
 			if moveBoard.MakeMove(move) != true {
 				// fmt.Printf("Illegal move: %s\nBoard is:\n%s\n\n", GetMoveString(move), &moveBoard)
@@ -32,7 +28,8 @@ func Perft(board Board, depth int) {
 				continue
 			}
 
-			fmt.Printf("Made move %s\nBoard is:\n%s\n\n", GetMoveString(move), &moveBoard)
+			// fmt.Printf("Made move %s\nBoard is:\n%s\n\n", GetMoveString(move), &moveBoard)
+			// fmt.Printf("Made move %s\n", GetMoveString(move))
 			if (depth + 1) == PerftMaxDepth {
 				PerftMoveCounter++
 			}
