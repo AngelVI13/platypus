@@ -10,6 +10,8 @@ func (board *Board) addPieceToSq(pieceType, sq int) {
 
 // MakeMove makes a move
 func (board *Board) MakeMove(move int) bool {
+	board.UpdateBitMasks()
+
 	fromSq := FromSq(move)
 	toSq := ToSq(move)
 	pieceType := PieceType(move)
@@ -44,7 +46,6 @@ func (board *Board) MakeMove(move int) bool {
 
 	// todo might have to update EnemyPieces here, otherwise we rely that somebody called GetMoves before that
 	// todo Or store this bitboard in history and in current board
-
 	// if ToSq is occupied by one of enemy's pieces -> it was a capture
 	if (EnemyPieces>>toSq)&1 == 1 {
 		board.fiftyMove = 0 // reset 50 move rule counter
@@ -95,6 +96,10 @@ func (board *Board) MakeMove(move int) bool {
 		PerftPromotions++
 		// todo update material here
 		board.addPieceToSq(promoted, toSq)
+		// we already move the pawn to the 8th rank and since it is a promotion
+		// not only we add the promoted piece but we need to remove the pawn
+		// from the 8th rank
+		board.removePieceFromSq(pieceType, toSq)
 	}
 
 	// Check if after the current player makes a move

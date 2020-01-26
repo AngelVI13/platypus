@@ -9,8 +9,6 @@ var PerftPromotions int
 
 func Perft(board Board, depth int) {
 	if depth < PerftMaxDepth {
-		// fmt.Printf("Perft: Current depth: %d\n", depth)
-		// fmt.Printf("Perft: Current side: %d\n", board.Side)
 		var moveList MoveList
 		if board.Side == White {
 			board.PossibleMovesWhite(&moveList)
@@ -28,12 +26,20 @@ func Perft(board Board, depth int) {
 				continue
 			}
 
-			// fmt.Printf("Made move %s\nBoard is:\n%s\n\n", GetMoveString(move), &moveBoard)
-			// fmt.Printf("Made move %s\n", GetMoveString(move))
+			// var currentMoveCount int
+			// if depth == 0 {
+			// 	currentMoveCount = PerftMoveCounter
+			// }
+
 			if (depth + 1) == PerftMaxDepth {
 				PerftMoveCounter++
 			}
 			Perft(moveBoard, depth+1)
+
+			// if depth == 0 {
+			// 	currentMoveCount = PerftMoveCounter - currentMoveCount
+			// 	fmt.Printf("%s: %d\n", GetMoveString(move), currentMoveCount)
+			// }
 		}
 	}
 }

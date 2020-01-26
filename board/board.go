@@ -48,7 +48,7 @@ const (
 // same, since 15 is the max number associated with all possible castling permissions
 // for both sides
 var CastlePerm = [64]int{
-	7,  15, 15, 15,  3, 15, 15, 11,
+	7, 15, 15, 15, 3, 15, 15, 11,
 	15, 15, 15, 15, 15, 15, 15, 15,
 	15, 15, 15, 15, 15, 15, 15, 15,
 	15, 15, 15, 15, 15, 15, 15, 15,
@@ -57,7 +57,6 @@ var CastlePerm = [64]int{
 	15, 15, 15, 15, 15, 15, 15, 15,
 	13, 15, 15, 15, 12, 15, 15, 14,
 }
-
 
 // Defines for castling rights
 // The values are such that they each represent a bit from a 4 bit int value
@@ -75,13 +74,13 @@ type Board struct {
 	bitboards         [13]uint64
 	Side              int
 	castlePermissions int
-	fiftyMove         int  // how many moves from the fifty move rule have been made
+	fiftyMove         int // how many moves from the fifty move rule have been made
 
 }
 
 // Reset Resets current board
 func (board *Board) Reset() {
-	for i :=0; i < 13; i++ {
+	for i := 0; i < 13; i++ {
 		board.bitboards[i] = uint64(0)
 	}
 	board.Side = White
@@ -330,6 +329,69 @@ func (board *Board) PrintBitboards() {
 		}
 		DrawBitboard(bitboard)
 		fmt.Println()
+	}
+}
+
+// UpdateBitMasks Updates all move generation/making related bit masks
+func (board *Board) UpdateBitMasks() {
+	if board.Side == White {
+		NotMyPieces = ^(board.bitboards[WP] |
+			board.bitboards[WN] |
+			board.bitboards[WB] |
+			board.bitboards[WR] |
+			board.bitboards[WQ] |
+			board.bitboards[WK] |
+			board.bitboards[BK])
+
+		EnemyPieces = (board.bitboards[BP] |
+			board.bitboards[BN] |
+			board.bitboards[BB] |
+			board.bitboards[BR] |
+			board.bitboards[BQ])
+
+		Occupied = (board.bitboards[WP] |
+			board.bitboards[WN] |
+			board.bitboards[WB] |
+			board.bitboards[WR] |
+			board.bitboards[WQ] |
+			board.bitboards[WK] |
+			board.bitboards[BP] |
+			board.bitboards[BN] |
+			board.bitboards[BB] |
+			board.bitboards[BR] |
+			board.bitboards[BQ] |
+			board.bitboards[BK])
+
+		Empty = ^Occupied
+	} else {
+		NotMyPieces = ^(board.bitboards[BP] |
+			board.bitboards[BN] |
+			board.bitboards[BB] |
+			board.bitboards[BR] |
+			board.bitboards[BQ] |
+			board.bitboards[BK] |
+			board.bitboards[WK])
+
+		EnemyPieces = (board.bitboards[WP] |
+			board.bitboards[WN] |
+			board.bitboards[WB] |
+			board.bitboards[WR] |
+			board.bitboards[WQ])
+
+		Occupied = (board.bitboards[WP] |
+			board.bitboards[WN] |
+			board.bitboards[WB] |
+			board.bitboards[WR] |
+			board.bitboards[WQ] |
+			board.bitboards[WK] |
+			board.bitboards[BP] |
+			board.bitboards[BN] |
+			board.bitboards[BB] |
+			board.bitboards[BR] |
+			board.bitboards[BQ] |
+			board.bitboards[BK])
+
+		Empty = ^Occupied
 	}
 }
 
