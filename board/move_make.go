@@ -1,5 +1,23 @@
 package board
 
+
+// --- Hashing 'macros' ---
+func (board *Board) hashPiece(piece, sq int) {
+	board.positionKey ^= PieceKeys[piece][sq]
+}
+
+func (board *Board) hashCastlePerm() {
+	board.positionKey ^= CastleKeys[board.castlePermissions]
+}
+
+func (board *Board) hashSide() {
+	board.positionKey ^= SideKey
+}
+
+func (board *Board) hashEnPass() {
+	board.positionKey ^= PieceKeys[Empty][board.enPassantFile]
+}
+
 func (board *Board) removePieceFromSq(pieceType, sq int) {
 	board.bitboards[pieceType] &= (^(1 << sq))
 }
