@@ -107,22 +107,6 @@ const (
 	G8 int = 6
 )
 
-// NotMyPieces bitboard with all enemy and empty squares
-// TODO These should be in a struct (board?)
-var NotMyPieces uint64
-
-// EnemyPieces bitboard with all the squares of enemy pieces
-var EnemyPieces uint64
-
-// Empty bitboard with all the empty squares
-var Empty uint64
-
-// Occupied bitboard with all the occupied squares
-var Occupied uint64
-
-// Unsafe bitboard with all the unsafe squares for the current side
-var Unsafe uint64
-
 // Move Move type
 type Move struct {
 	Move  int // todo consider move to be uint32 instead of int

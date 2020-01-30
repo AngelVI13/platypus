@@ -4,66 +4,66 @@ import (
 	"testing"
 )
 
-func TestPossibleMovesWhite(t *testing.T) {
-	board := Board{}
-	board.ParseFen("rnb2k1r/pp1Pbppp/2p5/q7/2B5/8/PPPBNnPP/RNB1K2R w QK - 3 9")
+// func TestPossibleMovesWhite(t *testing.T) {
+// 	board := Board{}
+// 	board.ParseFen("rnb2k1r/pp1Pbppp/2p5/q7/2B5/8/PPPBNnPP/RNB1K2R w QK - 3 9")
 
-	var moveList MoveList
-	board.PossibleMovesWhite(&moveList)
-	// board.PossibleMovesBlack(&moveList)
-	PrintMoveList(&moveList)
+// 	var moveList MoveList
+// 	board.PossibleMovesWhite(&moveList)
+// 	// board.PossibleMovesBlack(&moveList)
+// 	PrintMoveList(&moveList)
 
-	// fmt.Println(len(moveList) / 4)
-	t.Errorf("Error")
-}
+// 	// fmt.Println(len(moveList) / 4)
+// 	t.Errorf("Error")
+// }
 
-func TestPossiblePawnMovesWhite(t *testing.T) {
-	board := Board{}
-	// board.ParseStringArray(StartingPosition)
-	board.ParseStringArray([8][8]string{
-		[8]string{" ", "n", "b", "q", "k", "b", "n", "r"},
-		[8]string{"P", "p", " ", "p", " ", "p", "P", "p"},
-		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
-		[8]string{" ", " ", "p", "P", "p", " ", " ", " "},
-		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
-		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
-		[8]string{"P", "P", "P", "P", "P", "P", "P", "P"},
-		[8]string{"R", "N", "B", "Q", "K", "B", "N", "R"}})
+// func TestPossiblePawnMovesWhite(t *testing.T) {
+// 	board := Board{}
+// 	// board.ParseStringArray(StartingPosition)
+// 	board.ParseFen([8][8]string{
+// 		[8]string{" ", "n", "b", "q", "k", "b", "n", "r"},
+// 		[8]string{"P", "p", " ", "p", " ", "p", "P", "p"},
+// 		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+// 		[8]string{" ", " ", "p", "P", "p", " ", " ", " "},
+// 		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+// 		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+// 		[8]string{"P", "P", "P", "P", "P", "P", "P", "P"},
+// 		[8]string{"R", "N", "B", "Q", "K", "B", "N", "R"}})
 
-	// enable all files on enpassant bitboard
-	board.bitboards[EP] = ^uint64(0)
+// 	// enable all files on enpassant bitboard
+// 	board.bitboards[EP] = ^uint64(0)
 
-	var moveList MoveList
-	board.PossibleMovesWhite(&moveList)
+// 	var moveList MoveList
+// 	board.PossibleMovesWhite(&moveList)
 
-	if moveList.Count+1 != 36 {
-		t.Errorf("Incorrect number of moves for white pawns")
-	}
-}
+// 	if moveList.Count+1 != 36 {
+// 		t.Errorf("Incorrect number of moves for white pawns")
+// 	}
+// }
 
-func TestPossiblePawnMovesBlack(t *testing.T) {
-	board := Board{}
-	// board.ParseStringArray(StartingPosition)
-	board.ParseStringArray([8][8]string{
-		[8]string{"r", "n", "b", "q", "k", "b", "n", "r"},
-		[8]string{"p", "p", "p", "p", "p", "p", "p", "p"},
-		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
-		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
-		[8]string{" ", " ", "P", "p", "P", " ", " ", " "},
-		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
-		[8]string{"p", "P", " ", "P", " ", "P", "p", "P"},
-		[8]string{" ", "N", "B", "Q", "K", "B", "N", "R"}})
+// func TestPossiblePawnMovesBlack(t *testing.T) {
+// 	board := Board{}
+// 	// board.ParseStringArray(StartingPosition)
+// 	board.ParseStringArray([8][8]string{
+// 		[8]string{"r", "n", "b", "q", "k", "b", "n", "r"},
+// 		[8]string{"p", "p", "p", "p", "p", "p", "p", "p"},
+// 		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+// 		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+// 		[8]string{" ", " ", "P", "p", "P", " ", " ", " "},
+// 		[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
+// 		[8]string{"p", "P", " ", "P", " ", "P", "p", "P"},
+// 		[8]string{" ", "N", "B", "Q", "K", "B", "N", "R"}})
 
-	// enable all files on enpassant bitboard
-	board.bitboards[EP] = ^uint64(0)
+// 	// enable all files on enpassant bitboard
+// 	board.bitboards[EP] = ^uint64(0)
 
-	var moveList MoveList
-	board.PossibleMovesBlack(&moveList)
+// 	var moveList MoveList
+// 	board.PossibleMovesBlack(&moveList)
 
-	if moveList.Count+1 != 36 {
-		t.Errorf("Incorrect number of moves for white pawns")
-	}
-}
+// 	if moveList.Count+1 != 36 {
+// 		t.Errorf("Incorrect number of moves for white pawns")
+// 	}
+// }
 
 func TestGetMoveIntPawnStart(t *testing.T) {
 	move := GetMoveInt(63, 0, WP, WQ, MoveFlagPawnStart)
@@ -146,14 +146,14 @@ func TestGetMoveIntEnPassant(t *testing.T) {
 	}
 }
 
-func BenchmarkPossibleMovesWhite(b *testing.B) {
-	board := Board{}
-	board.ParseStringArray(StartingPosition)
+// func BenchmarkPossibleMovesWhite(b *testing.B) {
+// 	board := Board{}
+// 	board.ParseStringArray(StartingPosition)
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		var moveList MoveList
-		board.PossibleMovesWhite(&moveList)
-	}
-	b.StopTimer()
-}
+// 	b.ResetTimer()
+// 	for i := 0; i < b.N; i++ {
+// 		var moveList MoveList
+// 		board.PossibleMovesWhite(&moveList)
+// 	}
+// 	b.StopTimer()
+// }

@@ -14,6 +14,22 @@ func InitHashKeys() {
 	for i := 0; i < 16; i++ {
 		CastleKeys[i] = rand.Uint64()
 	}
+
+	// Pregeneration of possible knight moves
+	for i:= 0; i < BoardSquareNum; i++ {
+		var possibility uint64
+		if i > 18 {
+			possibility = KnightSpan << (i - 18)
+		} else {
+			possibility = KnightSpan >> (18 - i)
+		}
+		if i % 8 < 4 {
+			possibility &= (^FileGH)
+		} else {
+			possibility &= (^FileAB)
+		}
+		KnightMoves[i] = possibility
+	}
 }
 
 // PieceKeys hashkeys for each piece for each possible position for the key
@@ -24,3 +40,6 @@ var SideKey uint64
 
 // CastleKeys haskeys associated with castling rights
 var CastleKeys [16]uint64 // castling value ranges from 0-15 -> we need 16 hashkeys
+
+// KnightMoves an array of bitboards indicating every square the knight can go to from a given board index
+var KnightMoves [BoardSquareNum]uint64

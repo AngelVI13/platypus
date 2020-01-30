@@ -2,19 +2,10 @@ package board
 
 import (
 	"fmt"
-	"strconv"
 )
 
 // StartingPosition 8x8 representation of normal chess starting position
-var StartingPosition [8][8]string = [8][8]string{
-	[8]string{"r", "n", "b", "q", "k", "b", "n", "r"},
-	[8]string{"p", "p", "p", "p", "p", "p", "p", "p"},
-	[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
-	[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
-	[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
-	[8]string{" ", " ", " ", " ", " ", " ", " ", " "},
-	[8]string{"P", "P", "P", "P", "P", "P", "P", "P"},
-	[8]string{"R", "N", "B", "Q", "K", "B", "N", "R"}}
+const StartingPosition string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 // Indexes to access bitboards i.e. WP - white pawn, BB - black bishop
 const (
@@ -32,6 +23,24 @@ const (
 	BK
 	EP // en passant file bitboard
 )
+
+const (
+	// NotMyPieces index to bitboard with all enemy and empty squares
+	NotMyPieces int = iota
+
+	// EnemyPieces index to bitboard with all the squares of enemy pieces
+	EnemyPieces
+
+	// Empty index to bitboard with all the empty squares
+	Empty
+
+	// Occupied index to bitboard with all the occupied squares
+	Occupied
+
+	// Unsafe index to bitboard with all the unsafe squares for the current side
+	Unsafe
+)
+
 
 // Defines for colours
 const (
@@ -86,6 +95,7 @@ type Undo struct {
 // Board Struct to represent the chess board
 type Board struct {
 	bitboards         [13]uint64
+	stateBoards       [5]uint64  // bitboards representing a state i.e. EnemyPieces, Empty, Occupied etc.
 	Side              int
 	castlePermissions int
 	ply               int // how many half moves have been made
@@ -198,7 +208,7 @@ func (board *Board) PrintBitboards() {
 // UpdateBitMasks Updates all move generation/making related bit masks
 func (board *Board) UpdateBitMasks() {
 	if board.Side == White {
-		NotMyPieces = ^(board.bitboards[WP] |
+		board.stateBoards[NotMyPieces] = ^(board.bitboards[WP] |
 			board.bitboards[WN] |
 			board.bitboards[WB] |
 			board.bitboards[WR] |
@@ -206,13 +216,13 @@ func (board *Board) UpdateBitMasks() {
 			board.bitboards[WK] |
 			board.bitboards[BK])
 
-		EnemyPieces = (board.bitboards[BP] |
+		board.stateBoards[EnemyPieces] = (board.bitboards[BP] |
 			board.bitboards[BN] |
 			board.bitboards[BB] |
 			board.bitboards[BR] |
 			board.bitboards[BQ])
 
-		Occupied = (board.bitboards[WP] |
+		board.stateBoards[Occupied] = (board.bitboards[WP] |
 			board.bitboards[WN] |
 			board.bitboards[WB] |
 			board.bitboards[WR] |
@@ -225,9 +235,9 @@ func (board *Board) UpdateBitMasks() {
 			board.bitboards[BQ] |
 			board.bitboards[BK])
 
-		Empty = ^Occupied
+		board.stateBoards[Empty] = ^board.stateBoards[Occupied]
 	} else {
-		NotMyPieces = ^(board.bitboards[BP] |
+		board.stateBoards[NotMyPieces] = ^(board.bitboards[BP] |
 			board.bitboards[BN] |
 			board.bitboards[BB] |
 			board.bitboards[BR] |
@@ -235,13 +245,13 @@ func (board *Board) UpdateBitMasks() {
 			board.bitboards[BK] |
 			board.bitboards[WK])
 
-		EnemyPieces = (board.bitboards[WP] |
+		board.stateBoards[EnemyPieces] = (board.bitboards[WP] |
 			board.bitboards[WN] |
 			board.bitboards[WB] |
 			board.bitboards[WR] |
 			board.bitboards[WQ])
 
-		Occupied = (board.bitboards[WP] |
+		board.stateBoards[Occupied] = (board.bitboards[WP] |
 			board.bitboards[WN] |
 			board.bitboards[WB] |
 			board.bitboards[WR] |
@@ -254,6 +264,6 @@ func (board *Board) UpdateBitMasks() {
 			board.bitboards[BQ] |
 			board.bitboards[BK])
 
-		Empty = ^Occupied
+		board.stateBoards[Empty] = ^board.stateBoards[Occupied]
 	}
 }
