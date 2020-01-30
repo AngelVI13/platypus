@@ -448,35 +448,24 @@ func (board *Board) DiagonalAndAntiDiagonalMoves(square int, occupied uint64) ui
 // 	}
 // }
 
-// func (board *Board) possibleKingMoves(moveList *MoveList, king uint64, pieceType int) {
-// 	var possibility uint64
+func (board *Board) possibleKingMoves(moveList *MoveList, king uint64, pieceType int) {
+	var possibility uint64
 
-// 	// Current king index (in bitmask)
-// 	kingIdx := bits.TrailingZeros64(king)
+	// Current king index (in bitmask)
+	kingIdx := bits.TrailingZeros64(king)
 
-// 	if kingIdx > 9 {
-// 		possibility = KingSpan << (kingIdx - 9)
-// 	} else {
-// 		possibility = KingSpan >> (9 - kingIdx)
-// 	}
+	possibility = KingMoves[kingIdx] & board.stateBoards[NotMyPieces] & ^board.stateBoards[Unsafe]
 
-// 	// handle wrap around of knight pattern movement
-// 	if kingIdx%8 < 4 {
-// 		possibility &= (^FileGH) & NotMyPieces
-// 	} else {
-// 		possibility &= (^FileAB) & NotMyPieces
-// 	}
-
-// 	// choose move
-// 	movePossibility := possibility & (^(possibility - 1))
-// 	for movePossibility != 0 {
-// 		// possible move index (in bitmask)
-// 		moveIndex := bits.TrailingZeros64(movePossibility)
-// 		moveList.AddMove(GetMoveInt(kingIdx, moveIndex, pieceType, 0, NoFlag))
-// 		possibility &= ^movePossibility                      // remove move from all possible moves
-// 		movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
-// 	}
-// }
+	// choose move
+	movePossibility := possibility & (^(possibility - 1))
+	for movePossibility != 0 {
+		// possible move index (in bitmask)
+		moveIndex := bits.TrailingZeros64(movePossibility)
+		moveList.AddMove(GetMoveInt(kingIdx, moveIndex, pieceType, 0, NoFlag))
+		possibility &= ^movePossibility                      // remove move from all possible moves
+		movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
+	}
+}
 
 // func (board *Board) possibleCastleWhite(moveList *MoveList) {
 // 	kingIdx := bits.TrailingZeros64(board.bitboards[WK])

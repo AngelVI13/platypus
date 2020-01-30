@@ -41,7 +41,6 @@ const (
 	Unsafe
 )
 
-
 // Defines for colours
 const (
 	White int = iota
@@ -68,7 +67,7 @@ var CastlePerm = [64]int{
 
 // MaxGameMoves Maximum number of game moves
 const (
-	MaxGameMoves int = 2048
+	MaxGameMoves   int = 2048
 	BoardSquareNum int = 64
 )
 
@@ -95,17 +94,18 @@ type Undo struct {
 // Board Struct to represent the chess board
 type Board struct {
 	bitboards         [13]uint64
-	stateBoards       [5]uint64  // bitboards representing a state i.e. EnemyPieces, Empty, Occupied etc.
+	stateBoards       [5]uint64 // bitboards representing a state i.e. EnemyPieces, Empty, Occupied etc.
 	Side              int
 	castlePermissions int
-	ply               int // how many half moves have been made
-	fiftyMove         int // how many moves from the fifty move rule have been made
-	positionKey       uint64 // position key is a unique key stored for each position (used to keep track of 3fold repetition)
+	ply               int                // how many half moves have been made
+	fiftyMove         int                // how many moves from the fifty move rule have been made
+	positionKey       uint64             // position key is a unique key stored for each position (used to keep track of 3fold repetition)
 	history           [MaxGameMoves]Undo // array that stores current position and variables before a move is made
 }
 
 // Reset Resets current board
 func (board *Board) Reset() {
+	// todo update with all variables
 	for i := 0; i < 13; i++ {
 		board.bitboards[i] = uint64(0)
 	}
@@ -236,6 +236,7 @@ func (board *Board) UpdateBitMasks() {
 			board.bitboards[BK])
 
 		board.stateBoards[Empty] = ^board.stateBoards[Occupied]
+		board.stateBoards[Unsafe] = board.unsafeForWhite()
 	} else {
 		board.stateBoards[NotMyPieces] = ^(board.bitboards[BP] |
 			board.bitboards[BN] |
@@ -265,5 +266,6 @@ func (board *Board) UpdateBitMasks() {
 			board.bitboards[BK])
 
 		board.stateBoards[Empty] = ^board.stateBoards[Occupied]
+		board.stateBoards[Unsafe] = board.unsafeForBlack()
 	}
 }

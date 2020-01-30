@@ -7,10 +7,11 @@ import (
 func TestLegalMovesWhite(t *testing.T) {
 	InitHashKeys()
 	board := Board{}
-	board.ParseFen("8/8/4k3/8/4R3/8/8/4K3 b - - 0 1")
+	board.ParseFen("8/4k3/8/8/4r3/6b1/8/4K3 w - - 0 1")
 
-	// board.LegalMovesWhite()
-	DrawBitboard(board.unsafeForBlack())
+	var moveList MoveList
+	board.LegalMovesWhite(&moveList)
+	PrintMoveList(&moveList)
 
 	// fmt.Println(len(moveList) / 4)
 	t.Errorf("Error")

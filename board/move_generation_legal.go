@@ -1,6 +1,7 @@
 package board
 
 import (
+	"fmt"
 	"math/bits"
 )
 
@@ -22,14 +23,18 @@ func (board *Board) getCheckers(king uint64) uint64 {
 	return checkers
 }
 
-func (board *Board) LegalMovesWhite() {
+func (board *Board) LegalMovesWhite(moveList *MoveList) {
 	board.UpdateBitMasks()
 
-	// todo first generate all king moves!
+	board.possibleKingMoves(moveList, board.bitboards[WK], WK)
 
 	checkers := board.getCheckers(board.bitboards[WK])
 
-	// todo then if checkers bit count is > 1 -> simply return the generated king moves since these are the only moves we can make
+	if bits.OnesCount64(checkers) > 1 {
+		// if there are more than 1 checking piece -> only king moves are possible
+		return
+	}
 
+	fmt.Println("One or 0 checkers")
 	DrawBitboard(checkers)
 }
