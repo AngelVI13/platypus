@@ -16,19 +16,38 @@ func InitHashKeys() {
 	}
 
 	// Pregeneration of possible knight moves
-	for i:= 0; i < BoardSquareNum; i++ {
+	for i := 0; i < BoardSquareNum; i++ {
 		var possibility uint64
 		if i > 18 {
 			possibility = KnightSpan << (i - 18)
 		} else {
 			possibility = KnightSpan >> (18 - i)
 		}
-		if i % 8 < 4 {
+		if i%8 < 4 {
 			possibility &= (^FileGH)
 		} else {
 			possibility &= (^FileAB)
 		}
 		KnightMoves[i] = possibility
+	}
+
+	// Pregeneration of possible king moves
+	for i := 0; i < BoardSquareNum; i++ {
+		var possibility uint64
+
+		if i > 9 {
+			possibility = KingSpan << (i - 9)
+		} else {
+			possibility = KingSpan >> (9 - i)
+		}
+
+		if i%8 < 4 {
+			possibility &= (^FileGH)
+		} else {
+			possibility &= (^FileAB)
+		}
+
+		KingMoves[i] = possibility
 	}
 }
 
@@ -43,3 +62,6 @@ var CastleKeys [16]uint64 // castling value ranges from 0-15 -> we need 16 hashk
 
 // KnightMoves an array of bitboards indicating every square the knight can go to from a given board index
 var KnightMoves [BoardSquareNum]uint64
+
+// KingMoves an array of bitboards indicating every square the king can go to from a given board index
+var KingMoves [BoardSquareNum]uint64

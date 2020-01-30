@@ -505,162 +505,94 @@ func (board *Board) DiagonalAndAntiDiagonalMoves(square int, occupied uint64) ui
 // 	}
 // }
 
-// func (board *Board) unsafeForBlack() (unsafe uint64) {
-// 	// todo should it update global value ??
-// 	Occupied = (board.bitboards[WP] |
-// 		board.bitboards[WN] |
-// 		board.bitboards[WB] |
-// 		board.bitboards[WR] |
-// 		board.bitboards[WQ] |
-// 		board.bitboards[WK] |
-// 		board.bitboards[BP] |
-// 		board.bitboards[BN] |
-// 		board.bitboards[BB] |
-// 		board.bitboards[BR] |
-// 		board.bitboards[BQ] |
-// 		board.bitboards[BK])
+func (board *Board) unsafeForBlack() (unsafe uint64) {
+	// pawn
+	unsafe = ((board.bitboards[WP] >> 7) & (^FileA))  // pawn capture right
+	unsafe |= ((board.bitboards[WP] >> 9) & (^FileH)) // pawn capture left
 
-// 	// pawn
-// 	unsafe = ((board.bitboards[WP] >> 7) & (^FileA))  // pawn capture right
-// 	unsafe |= ((board.bitboards[WP] >> 9) & (^FileH)) // pawn capture left
+	var possibility uint64
+	// knight
+	wn := board.bitboards[WN]
+	i := wn & (^(wn - 1))
+	for i != 0 {
+		iLocation := bits.TrailingZeros64(i)
+		possibility = KnightMoves[iLocation]
+		unsafe |= possibility
+		wn &= (^i)
+		i = wn & (^(wn - 1))
+	}
 
-// 	var possibility uint64
-// 	// knight
-// 	wn := board.bitboards[WN]
-// 	i := wn & (^(wn - 1))
-// 	for i != 0 {
-// 		iLocation := bits.TrailingZeros64(i)
-// 		if iLocation > 18 {
-// 			possibility = KnightSpan << (iLocation - 18)
-// 		} else {
-// 			possibility = KnightSpan >> (18 - iLocation)
-// 		}
+	// bishop/queen
+	qb := board.bitboards[WQ] | board.bitboards[WB]
+	i = qb & (^(qb - 1))
+	for i != 0 {
+		iLocation := bits.TrailingZeros64(i)
+		possibility = board.DiagonalAndAntiDiagonalMoves(iLocation, board.stateBoards[Occupied])
+		unsafe |= possibility
+		qb &= (^i)
+		i = qb & (^(qb - 1))
+	}
 
-// 		if iLocation%8 < 4 {
-// 			possibility &= (^FileGH)
-// 		} else {
-// 			possibility &= (^FileAB)
-// 		}
-// 		unsafe |= possibility
-// 		wn &= (^i)
-// 		i = wn & (^(wn - 1))
-// 	}
+	// rook/queen
+	qr := board.bitboards[WQ] | board.bitboards[WR]
+	i = qr & (^(qr - 1))
+	for i != 0 {
+		iLocation := bits.TrailingZeros64(i)
+		possibility = board.HorizontalAndVerticalMoves(iLocation, board.stateBoards[Occupied])
+		unsafe |= possibility
+		qr &= (^i)
+		i = qr & (^(qr - 1))
+	}
 
-// 	// bishop/queen
-// 	qb := board.bitboards[WQ] | board.bitboards[WB]
-// 	i = qb & (^(qb - 1))
-// 	for i != 0 {
-// 		iLocation := bits.TrailingZeros64(i)
-// 		possibility = board.DiagonalAndAntiDiagonalMoves(iLocation)
-// 		unsafe |= possibility
-// 		qb &= (^i)
-// 		i = qb & (^(qb - 1))
-// 	}
+	// king
+	iLocation := bits.TrailingZeros64(board.bitboards[WK])
+	possibility = KingMoves[iLocation]
+	unsafe |= possibility
+	return unsafe
+}
 
-// 	// rook/queen
-// 	qr := board.bitboards[WQ] | board.bitboards[WR]
-// 	i = qr & (^(qr - 1))
-// 	for i != 0 {
-// 		iLocation := bits.TrailingZeros64(i)
-// 		possibility = board.HorizontalAndVerticalMoves(iLocation)
-// 		unsafe |= possibility
-// 		qr &= (^i)
-// 		i = qr & (^(qr - 1))
-// 	}
+func (board *Board) unsafeForWhite() (unsafe uint64) {
+	// pawn
+	unsafe = ((board.bitboards[BP] << 7) & (^FileH))  // pawn capture right
+	unsafe |= ((board.bitboards[BP] << 9) & (^FileA)) // pawn capture left
 
-// 	// king
-// 	iLocation := bits.TrailingZeros64(board.bitboards[WK])
-// 	if iLocation > 9 {
-// 		possibility = KingSpan << (iLocation - 9)
-// 	} else {
-// 		possibility = KingSpan >> (9 - iLocation)
-// 	}
+	var possibility uint64
+	// knight
+	bn := board.bitboards[BN]
+	i := bn & (^(bn - 1))
+	for i != 0 {
+		iLocation := bits.TrailingZeros64(i)
+		possibility = KnightMoves[iLocation]
+		unsafe |= possibility
+		bn &= (^i)
+		i = bn & (^(bn - 1))
+	}
 
-// 	if iLocation%8 < 4 {
-// 		possibility &= (^FileGH)
-// 	} else {
-// 		possibility &= (^FileAB)
-// 	}
-// 	unsafe |= possibility
-// 	return unsafe
-// }
+	// bishop/queen
+	qb := board.bitboards[BQ] | board.bitboards[BB]
+	i = qb & (^(qb - 1))
+	for i != 0 {
+		iLocation := bits.TrailingZeros64(i)
+		possibility = board.DiagonalAndAntiDiagonalMoves(iLocation, board.stateBoards[Occupied])
+		unsafe |= possibility
+		qb &= (^i)
+		i = qb & (^(qb - 1))
+	}
 
-// func (board *Board) unsafeForWhite() (unsafe uint64) {
-// 	// todo should it update global value ??
-// 	Occupied = (board.bitboards[WP] |
-// 		board.bitboards[WN] |
-// 		board.bitboards[WB] |
-// 		board.bitboards[WR] |
-// 		board.bitboards[WQ] |
-// 		board.bitboards[WK] |
-// 		board.bitboards[BP] |
-// 		board.bitboards[BN] |
-// 		board.bitboards[BB] |
-// 		board.bitboards[BR] |
-// 		board.bitboards[BQ] |
-// 		board.bitboards[BK])
+	// rook/queen
+	qr := board.bitboards[BQ] | board.bitboards[BR]
+	i = qr & (^(qr - 1))
+	for i != 0 {
+		iLocation := bits.TrailingZeros64(i)
+		possibility = board.HorizontalAndVerticalMoves(iLocation, board.stateBoards[Occupied])
+		unsafe |= possibility
+		qr &= (^i)
+		i = qr & (^(qr - 1))
+	}
 
-// 	// pawn
-// 	unsafe = ((board.bitboards[BP] << 7) & (^FileH))  // pawn capture right
-// 	unsafe |= ((board.bitboards[BP] << 9) & (^FileA)) // pawn capture left
-
-// 	var possibility uint64
-// 	// knight
-// 	bn := board.bitboards[BN]
-// 	i := bn & (^(bn - 1))
-// 	for i != 0 {
-// 		iLocation := bits.TrailingZeros64(i)
-// 		if iLocation > 18 {
-// 			possibility = KnightSpan << (iLocation - 18)
-// 		} else {
-// 			possibility = KnightSpan >> (18 - iLocation)
-// 		}
-
-// 		if iLocation%8 < 4 {
-// 			possibility &= (^FileGH)
-// 		} else {
-// 			possibility &= (^FileAB)
-// 		}
-// 		unsafe |= possibility
-// 		bn &= (^i)
-// 		i = bn & (^(bn - 1))
-// 	}
-
-// 	// bishop/queen
-// 	qb := board.bitboards[BQ] | board.bitboards[BB]
-// 	i = qb & (^(qb - 1))
-// 	for i != 0 {
-// 		iLocation := bits.TrailingZeros64(i)
-// 		possibility = board.DiagonalAndAntiDiagonalMoves(iLocation)
-// 		unsafe |= possibility
-// 		qb &= (^i)
-// 		i = qb & (^(qb - 1))
-// 	}
-
-// 	// rook/queen
-// 	qr := board.bitboards[BQ] | board.bitboards[BR]
-// 	i = qr & (^(qr - 1))
-// 	for i != 0 {
-// 		iLocation := bits.TrailingZeros64(i)
-// 		possibility = board.HorizontalAndVerticalMoves(iLocation)
-// 		unsafe |= possibility
-// 		qr &= (^i)
-// 		i = qr & (^(qr - 1))
-// 	}
-
-// 	// king
-// 	iLocation := bits.TrailingZeros64(board.bitboards[BK])
-// 	if iLocation > 9 {
-// 		possibility = KingSpan << (iLocation - 9)
-// 	} else {
-// 		possibility = KingSpan >> (9 - iLocation)
-// 	}
-
-// 	if iLocation%8 < 4 {
-// 		possibility &= (^FileGH)
-// 	} else {
-// 		possibility &= (^FileAB)
-// 	}
-// 	unsafe |= possibility
-// 	return unsafe
-// }
+	// king
+	iLocation := bits.TrailingZeros64(board.bitboards[BK])
+	possibility = KingMoves[iLocation]
+	unsafe |= possibility
+	return unsafe
+}
