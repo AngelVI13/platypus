@@ -24,6 +24,22 @@ const (
 	EP // en passant file bitboard
 )
 
+// IsSlider maps piece type to information if it is a sliding piece or not (i.e. rook, bishop, queen)
+var IsSlider = map[int]bool{
+	WP: false,
+	WN: false,
+	WB: true,
+	WR: true,
+	WQ: true,
+	WK: false,
+	BP: false,
+	BN: false,
+	BB: true,
+	BR: true,
+	BQ: true,
+	BK: false,
+}
+
 const (
 	// NotMyPieces index to bitboard with all enemy and empty squares
 	NotMyPieces int = iota
