@@ -23,6 +23,65 @@ func (board *Board) getCheckers(king uint64) uint64 {
 	return checkers
 }
 
+// getSliderRaysToSquare Get diagonal OR horizontal rays to a square given
+func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uint64 {
+	var rays uint64
+	kingIdx := bits.TrailingZeros64(kingBitboard)
+
+	rays = kingBitboard
+	newSquare := kingIdx
+	// generate file ray to the right
+	for (rays&checkerBitboard == 0) && (newSquare+1)%8 != 0 {
+		newSquare++
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	rays = kingBitboard
+	newSquare = kingIdx
+	// generate file ray to the left
+	for (rays&checkerBitboard == 0) && (newSquare)%8 != 0 {
+		newSquare--
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	rays = kingBitboard
+	newSquare = kingIdx
+	// generate rank ray upwards
+	for (rays&checkerBitboard == 0) && (newSquare-8) > 0 {
+		newSquare -= 8
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	rays = kingBitboard
+	newSquare = kingIdx
+	// generate rank ray upwards
+	for (rays&checkerBitboard == 0) && (newSquare-8) < 64 {
+		newSquare += 8
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	// todo raise error if not returned by here
+	rays = kingBitboard
+
+	return rays
+}
+
 func (board *Board) LegalMovesWhite(moveList *MoveList) {
 	board.UpdateBitMasks()
 

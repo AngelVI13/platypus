@@ -17,6 +17,17 @@ func TestLegalMovesWhite(t *testing.T) {
 	t.Errorf("Error")
 }
 
+func TestGetCheckerSliderRaysToKing(t *testing.T) {
+	var kingBitboard uint64 = (1 << 27)
+	var checkerBitboard uint64 = (1 << 59)
+
+	DrawBitboard(kingBitboard)
+	DrawBitboard(checkerBitboard)
+	DrawBitboard(kingBitboard | checkerBitboard)
+	DrawBitboard(getCheckerSliderRaysToKing(kingBitboard, checkerBitboard))
+	t.Errorf("Error")
+}
+
 func BenchmarkGetCheckers(b *testing.B) {
 	InitHashKeys()
 	board := Board{}
