@@ -23,12 +23,12 @@ func (board *Board) getCheckers(king uint64) uint64 {
 	return checkers
 }
 
-// getSliderRaysToSquare Get diagonal OR horizontal rays to a square given
+// getCheckerSliderRaysToKing Get diagonal OR horizontal rays to a square. Ray does not include king or checker
 func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uint64 {
 	var rays uint64
 	kingIdx := bits.TrailingZeros64(kingBitboard)
 
-	rays = kingBitboard
+	rays = 0
 	newSquare := kingIdx
 	// generate file ray to the right
 	for (rays&checkerBitboard == 0) && (newSquare+1)%8 != 0 {
@@ -40,7 +40,7 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 		}
 	}
 
-	rays = kingBitboard
+	rays = 0
 	newSquare = kingIdx
 	// generate file ray to the left
 	for (rays&checkerBitboard == 0) && (newSquare)%8 != 0 {
@@ -52,7 +52,7 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 		}
 	}
 
-	rays = kingBitboard
+	rays = 0
 	newSquare = kingIdx
 	// generate rank ray upwards
 	for (rays&checkerBitboard == 0) && (newSquare-8) > 0 {
@@ -64,7 +64,7 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 		}
 	}
 
-	rays = kingBitboard
+	rays = 0
 	newSquare = kingIdx
 	// generate rank ray down
 	for (rays&checkerBitboard == 0) && (newSquare+8) < 64 {
@@ -76,7 +76,7 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 		}
 	}
 
-	rays = kingBitboard
+	rays = 0
 	newSquare = kingIdx
 	// generate left diagonal down
 	for (rays&checkerBitboard == 0) && (newSquare+9) < 64 {
@@ -88,7 +88,7 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 		}
 	}
 
-	rays = kingBitboard
+	rays = 0
 	newSquare = kingIdx
 	// generate left diagonal up
 	for (rays&checkerBitboard == 0) && (newSquare-9) > 0 {
@@ -100,7 +100,7 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 		}
 	}
 
-	rays = kingBitboard
+	rays = 0
 	newSquare = kingIdx
 	// generate right diagonal down
 	for (rays&checkerBitboard == 0) && (newSquare+7) < 64 {
@@ -112,7 +112,7 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 		}
 	}
 
-	rays = kingBitboard
+	rays = 0
 	newSquare = kingIdx
 	// generate left diagonal up
 	for (rays&checkerBitboard == 0) && (newSquare-7) > 0 {
