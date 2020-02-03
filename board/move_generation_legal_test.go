@@ -18,8 +18,8 @@ func TestLegalMovesWhite(t *testing.T) {
 }
 
 func TestGetCheckerSliderRaysToKing(t *testing.T) {
-	var kingBitboard uint64 = (1 << 27)
-	var checkerBitboard uint64 = (1 << 59)
+	var kingBitboard uint64 = (1 << 3)
+	var checkerBitboard uint64 = (1 << 24)
 
 	DrawBitboard(kingBitboard)
 	DrawBitboard(checkerBitboard)

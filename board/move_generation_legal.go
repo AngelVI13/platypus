@@ -66,8 +66,8 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 
 	rays = kingBitboard
 	newSquare = kingIdx
-	// generate rank ray upwards
-	for (rays&checkerBitboard == 0) && (newSquare-8) < 64 {
+	// generate rank ray down
+	for (rays&checkerBitboard == 0) && (newSquare+8) < 64 {
 		newSquare += 8
 		rays |= (1 << newSquare)
 		if rays&checkerBitboard != 0 {
@@ -76,10 +76,56 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 		}
 	}
 
-	// todo raise error if not returned by here
 	rays = kingBitboard
+	newSquare = kingIdx
+	// generate left diagonal down
+	for (rays&checkerBitboard == 0) && (newSquare+9) < 64 {
+		newSquare += 9
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
 
-	return rays
+	rays = kingBitboard
+	newSquare = kingIdx
+	// generate left diagonal up
+	for (rays&checkerBitboard == 0) && (newSquare-9) > 0 {
+		newSquare -= 9
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	rays = kingBitboard
+	newSquare = kingIdx
+	// generate right diagonal down
+	for (rays&checkerBitboard == 0) && (newSquare+7) < 64 {
+		newSquare += 7
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	rays = kingBitboard
+	newSquare = kingIdx
+	// generate left diagonal up
+	for (rays&checkerBitboard == 0) && (newSquare-7) > 0 {
+		newSquare -= 7
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	// if we haven't returned by now -> couldn't generate rays
+	panic("Could not generate rays.")
 }
 
 func (board *Board) LegalMovesWhite(moveList *MoveList) {
@@ -108,7 +154,8 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 			if bitboard&checkers != 0 && IsSlider[pieceType] {
 				fmt.Println(pieceType)
 				// the push mask is limited to squares between the king and the piece giving check
-				pushMask = 0 // todo calculate rays
+				pushMask = getCheckerSliderRaysToKing(board.bitboards[WK], checkers)
+				break
 			}
 		}
 		// if we are not attacked by a sliding piece (i.e a knight) then
