@@ -11,8 +11,17 @@ func (board *Board) getCheckers(king uint64) uint64 {
 	kingIdx := bits.TrailingZeros64(king)
 
 	horizontalMoves := board.HorizontalAndVerticalMoves(kingIdx, board.stateBoards[Occupied])
+	fmt.Println("Horizontal moves")
+	DrawBitboard(horizontalMoves)
+	fmt.Println("Enemepy pieces")
+	DrawBitboard(board.stateBoards[EnemyPieces])
+	DrawBitboard(horizontalMoves & board.stateBoards[EnemyPieces])
 	checkers |= horizontalMoves & board.stateBoards[EnemyPieces]
 	diagonalMoves := board.DiagonalAndAntiDiagonalMoves(kingIdx, board.stateBoards[Occupied])
+	fmt.Println("diagonalMoves moves")
+	DrawBitboard(diagonalMoves)
+	fmt.Println("Enemepy pieces")
+	DrawBitboard(board.stateBoards[EnemyPieces])
 	checkers |= diagonalMoves & board.stateBoards[EnemyPieces]
 
 	// knight moves
@@ -144,6 +153,8 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 	checkersNum := bits.OnesCount64(checkers)
 	if checkersNum > 1 {
 		// if there are more than 1 checking piece -> only king moves are possible
+		fmt.Println("More than 1 checkers")
+		DrawBitboard(checkers)
 		return
 	} else if checkersNum == 1 {
 		// if only 1 checker, we can evade check by capturing the checking piece
