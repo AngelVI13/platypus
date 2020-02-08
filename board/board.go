@@ -47,6 +47,18 @@ const (
 	// EnemyPieces index to bitboard with all the squares of enemy pieces
 	EnemyPieces
 
+	// EnemyRooksQueens index to bitboard with all the squares of enemy rooks & queens
+	EnemyRooksQueens
+
+	// EnemyBishopsQueens index to bitboard with all the squares of enemy bishops & queens
+	EnemyBishopsQueens
+
+	// EnemyKnights index to bitboard with all the squares of enemy knights
+	EnemyKnights
+
+	// EnemyPawns index to bitboard with all the squares of enemy pawns
+	EnemyPawns
+
 	// Empty index to bitboard with all the empty squares
 	Empty
 
@@ -110,7 +122,7 @@ type Undo struct {
 // Board Struct to represent the chess board
 type Board struct {
 	bitboards         [13]uint64
-	stateBoards       [5]uint64 // bitboards representing a state i.e. EnemyPieces, Empty, Occupied etc.
+	stateBoards       [9]uint64 // bitboards representing a state i.e. EnemyPieces, Empty, Occupied etc.
 	Side              int
 	castlePermissions int
 	ply               int                // how many half moves have been made
@@ -251,6 +263,11 @@ func (board *Board) UpdateBitMasks() {
 			board.bitboards[BQ] |
 			board.bitboards[BK])
 
+		board.stateBoards[EnemyRooksQueens] = (board.bitboards[BQ] | board.bitboards[BR])
+		board.stateBoards[EnemyBishopsQueens] = (board.bitboards[BQ] | board.bitboards[BB])
+		board.stateBoards[EnemyKnights] = board.bitboards[BN]
+		board.stateBoards[EnemyPawns] = board.bitboards[BP]
+
 		board.stateBoards[Empty] = ^board.stateBoards[Occupied]
 		board.stateBoards[Unsafe] = board.unsafeForWhite()
 	} else {
@@ -280,6 +297,11 @@ func (board *Board) UpdateBitMasks() {
 			board.bitboards[BR] |
 			board.bitboards[BQ] |
 			board.bitboards[BK])
+
+		board.stateBoards[EnemyRooksQueens] = (board.bitboards[WQ] | board.bitboards[WR])
+		board.stateBoards[EnemyBishopsQueens] = (board.bitboards[WQ] | board.bitboards[WB])
+		board.stateBoards[EnemyKnights] = board.bitboards[WN]
+		board.stateBoards[EnemyPawns] = board.bitboards[WP]
 
 		board.stateBoards[Empty] = ^board.stateBoards[Occupied]
 		board.stateBoards[Unsafe] = board.unsafeForBlack()
