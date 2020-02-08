@@ -31,7 +31,7 @@ func TestGetCheckerSliderRaysToKing(t *testing.T) {
 func BenchmarkGetCheckers(b *testing.B) {
 	InitHashKeys()
 	board := Board{}
-	board.ParseFen("8/4r3/1b6/5nb1/2nP4/4K3/8/8 w - - 0 1")
+	board.ParseFen("8/2k1r3/1b6/5nb1/2nP4/4K3/8/8 w - - 0 1")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
