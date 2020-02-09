@@ -150,42 +150,118 @@ func (board *Board) String() string {
 		position[i/8][i%8] = " "
 	}
 
+	// todo unicode should be used only on linux -> add a flag to disable it on linux
 	for i := 0; i < 64; i++ {
 		if ((board.bitboards[WP] >> i) & 1) == 1 {
-			position[i/8][i%8] = "P"
+			position[i/8][i%8] = "\u265F" // P
 		}
 		if ((board.bitboards[WN] >> i) & 1) == 1 {
-			position[i/8][i%8] = "N"
+			position[i/8][i%8] = "\u265e" // N
 		}
 		if ((board.bitboards[WB] >> i) & 1) == 1 {
-			position[i/8][i%8] = "B"
+			position[i/8][i%8] = "\u265d" // B
 		}
 		if ((board.bitboards[WR] >> i) & 1) == 1 {
-			position[i/8][i%8] = "R"
+			position[i/8][i%8] = "\u265c" // R
 		}
 		if ((board.bitboards[WQ] >> i) & 1) == 1 {
-			position[i/8][i%8] = "Q"
+			position[i/8][i%8] = "\u265b" // Q
 		}
 		if ((board.bitboards[WK] >> i) & 1) == 1 {
-			position[i/8][i%8] = "K"
+			position[i/8][i%8] = "\u265a" // K
 		}
 		if ((board.bitboards[BP] >> i) & 1) == 1 {
-			position[i/8][i%8] = "p"
+			position[i/8][i%8] = "\u2659" // p
 		}
 		if ((board.bitboards[BN] >> i) & 1) == 1 {
-			position[i/8][i%8] = "n"
+			position[i/8][i%8] = "\u2658" // n
 		}
 		if ((board.bitboards[BB] >> i) & 1) == 1 {
-			position[i/8][i%8] = "b"
+			position[i/8][i%8] = "\u2657" // b
 		}
 		if ((board.bitboards[BR] >> i) & 1) == 1 {
-			position[i/8][i%8] = "r"
+			position[i/8][i%8] = "\u2656" // r
 		}
 		if ((board.bitboards[BQ] >> i) & 1) == 1 {
-			position[i/8][i%8] = "q"
+			position[i/8][i%8] = "\u2655" // q
 		}
 		if ((board.bitboards[BK] >> i) & 1) == 1 {
-			position[i/8][i%8] = "k"
+			position[i/8][i%8] = "\u2654" // k
+		}
+	}
+
+	var positionStr string
+	positionStr += "\n\n    \u05c0 "
+	startFileIdx := "A"[0]
+	for i := startFileIdx; i < startFileIdx+8; i++ {
+		positionStr += fmt.Sprintf("%s \u05c0 ", string(i))
+	}
+	positionStr += fmt.Sprintf("\n")
+
+	for idx, rank := range position {
+		positionStr += fmt.Sprintf("    ________________________________\n")
+		// positionStr += fmt.Sprintf("\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\n")
+		positionStr += fmt.Sprintf(" %d  \u05c0", (8 - idx))
+		// for _, file := range rank {
+		for i := (8 - 1); i >= 0; i-- {
+			positionStr += fmt.Sprintf(" %s \u05c0", rank[i]) // \u05c0
+		}
+		positionStr += "\n"
+	}
+	positionStr += fmt.Sprintf("    ________________________________\n")
+
+	// positionStr += "   \u05c0 "
+	// for i := startFileIdx; i < startFileIdx+8; i++ {
+	// 	positionStr += fmt.Sprintf("%s \u05c0 ", string(i))
+	// }
+	positionStr += fmt.Sprintf("\n")
+
+	return positionStr
+}
+
+func (board *Board) PrintBoard() {
+	var position [8][8]string
+
+	for i := 0; i < 64; i++ {
+		position[i/8][i%8] = " "
+	}
+
+	for i := 0; i < 64; i++ {
+		if ((board.bitboards[WP] >> i) & 1) == 1 {
+			position[i/8][i%8] = "P" // P
+		}
+		if ((board.bitboards[WN] >> i) & 1) == 1 {
+			position[i/8][i%8] = "N" // N
+		}
+		if ((board.bitboards[WB] >> i) & 1) == 1 {
+			position[i/8][i%8] = "B" // B
+		}
+		if ((board.bitboards[WR] >> i) & 1) == 1 {
+			position[i/8][i%8] = "R" // R
+		}
+		if ((board.bitboards[WQ] >> i) & 1) == 1 {
+			position[i/8][i%8] = "Q" // Q
+		}
+		if ((board.bitboards[WK] >> i) & 1) == 1 {
+			position[i/8][i%8] = "K" // K
+		}
+		if ((board.bitboards[BP] >> i) & 1) == 1 {
+			position[i/8][i%8] = "p" // p
+		}
+		if ((board.bitboards[BN] >> i) & 1) == 1 {
+			position[i/8][i%8] = "n" // n
+		}
+		if ((board.bitboards[BB] >> i) & 1) == 1 {
+			position[i/8][i%8] = "b" // b
+		}
+		if ((board.bitboards[BR] >> i) & 1) == 1 {
+			position[i/8][i%8] = "r" // r
+		}
+		if ((board.bitboards[BQ] >> i) & 1) == 1 {
+			position[i/8][i%8] = "q" // q
+		}
+		if ((board.bitboards[BK] >> i) & 1) == 1 {
+			position[i/8][i%8] = "k" // k
 		}
 	}
 
@@ -194,7 +270,8 @@ func (board *Board) String() string {
 		positionStr += fmt.Sprint(rank)
 		positionStr += "\n"
 	}
-	return positionStr
+	positionStr += fmt.Sprintf("\n")
+	fmt.Println(positionStr)
 }
 
 // PrintBitboards Outputs all internal bitboards in an easy to view way

@@ -1,6 +1,7 @@
 package board
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -8,7 +9,10 @@ func TestLegalMovesWhite(t *testing.T) {
 	InitHashKeys()
 	board := Board{}
 	board.ParseFen("5kq1/2b5/8/4pP2/2K5/8/8/8 w - e6 0 1")
+	// board.ParseFen(StartingPosition)
 
+	fmt.Println(&board)
+	board.PrintBoard()
 	var moveList MoveList
 	board.LegalMovesWhite(&moveList)
 	PrintMoveList(&moveList)

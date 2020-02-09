@@ -264,10 +264,33 @@ func DrawBitboard(bitboard uint64) {
 		}
 	}
 
-	for _, rank := range bitboardStr {
-		fmt.Printf("%s\n", rank)
+	// for _, rank := range bitboardStr {
+	// 	fmt.Printf("%s\n", rank)
+	// }
+	// fmt.Println()
+
+	var positionStr string
+	positionStr += "\n\n    \u05c0 "
+	startFileIdx := "A"[0]
+	for i := startFileIdx; i < startFileIdx+8; i++ {
+		positionStr += fmt.Sprintf("%s \u05c0 ", string(i))
 	}
-	fmt.Println()
+	positionStr += fmt.Sprintf("\n")
+
+	for idx, rank := range bitboardStr {
+		positionStr += fmt.Sprintf("    ________________________________\n")
+		// positionStr += fmt.Sprintf("\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\n")
+		positionStr += fmt.Sprintf(" %d  \u05c0", (8 - idx))
+		for _, file := range rank {
+			positionStr += fmt.Sprintf(" %s \u05c0", file) // \u05c0
+		}
+		positionStr += "\n"
+	}
+	positionStr += fmt.Sprintf("    ________________________________\n")
+
+	positionStr += fmt.Sprintf("\n")
+
+	fmt.Println(positionStr)
 }
 
 func abs(x int) int {
