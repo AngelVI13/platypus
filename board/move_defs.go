@@ -256,38 +256,27 @@ func DrawBitboard(bitboard uint64) {
 	for i := 0; i < 64; i++ {
 		if ((bitboard >> i) & 1) == 1 {
 			bitboardStr[i/8][i%8] = "X"
-		}
-
-		if bitboardStr[i/8][i%8] == "" {
-			// replace empty string with a space for better readibility of bitboard
-			bitboardStr[i/8][i%8] = " "
+		} else if bitboardStr[i/8][i%8] == "" {
+			// replace empty string with a dot for better readibility of bitboard
+			bitboardStr[i/8][i%8] = "."
 		}
 	}
-
-	// for _, rank := range bitboardStr {
-	// 	fmt.Printf("%s\n", rank)
-	// }
-	// fmt.Println()
 
 	var positionStr string
-	positionStr += "\n\n    \u05c0 "
-	startFileIdx := "A"[0]
-	for i := startFileIdx; i < startFileIdx+8; i++ {
-		positionStr += fmt.Sprintf("%s \u05c0 ", string(i))
-	}
-	positionStr += fmt.Sprintf("\n")
-
+	positionStr += "\n"
 	for idx, rank := range bitboardStr {
-		positionStr += fmt.Sprintf("    ________________________________\n")
-		// positionStr += fmt.Sprintf("\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\n")
-		positionStr += fmt.Sprintf(" %d  \u05c0", (8 - idx))
+		positionStr += fmt.Sprintf(" %d  ", (8 - idx))
 		for _, file := range rank {
-			positionStr += fmt.Sprintf(" %s \u05c0", file) // \u05c0
+			positionStr += fmt.Sprintf(" %s ", file)
 		}
 		positionStr += "\n"
 	}
-	positionStr += fmt.Sprintf("    ________________________________\n")
 
+	positionStr += "\n     "
+	startFileIdx := "A"[0]
+	for i := startFileIdx; i < startFileIdx+8; i++ {
+		positionStr += fmt.Sprintf("%s  ", string(i))
+	}
 	positionStr += fmt.Sprintf("\n")
 
 	fmt.Println(positionStr)

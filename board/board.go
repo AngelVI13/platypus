@@ -147,131 +147,52 @@ func (board *Board) String() string {
 	var position [8][8]string
 
 	for i := 0; i < 64; i++ {
-		position[i/8][i%8] = " "
-	}
-
-	// todo unicode should be used only on linux -> add a flag to disable it on linux
-	for i := 0; i < 64; i++ {
 		if ((board.bitboards[WP] >> i) & 1) == 1 {
-			position[i/8][i%8] = "\u265F" // P
-		}
-		if ((board.bitboards[WN] >> i) & 1) == 1 {
-			position[i/8][i%8] = "\u265e" // N
-		}
-		if ((board.bitboards[WB] >> i) & 1) == 1 {
-			position[i/8][i%8] = "\u265d" // B
-		}
-		if ((board.bitboards[WR] >> i) & 1) == 1 {
-			position[i/8][i%8] = "\u265c" // R
-		}
-		if ((board.bitboards[WQ] >> i) & 1) == 1 {
-			position[i/8][i%8] = "\u265b" // Q
-		}
-		if ((board.bitboards[WK] >> i) & 1) == 1 {
-			position[i/8][i%8] = "\u265a" // K
-		}
-		if ((board.bitboards[BP] >> i) & 1) == 1 {
-			position[i/8][i%8] = "\u2659" // p
-		}
-		if ((board.bitboards[BN] >> i) & 1) == 1 {
-			position[i/8][i%8] = "\u2658" // n
-		}
-		if ((board.bitboards[BB] >> i) & 1) == 1 {
-			position[i/8][i%8] = "\u2657" // b
-		}
-		if ((board.bitboards[BR] >> i) & 1) == 1 {
-			position[i/8][i%8] = "\u2656" // r
-		}
-		if ((board.bitboards[BQ] >> i) & 1) == 1 {
-			position[i/8][i%8] = "\u2655" // q
-		}
-		if ((board.bitboards[BK] >> i) & 1) == 1 {
-			position[i/8][i%8] = "\u2654" // k
+			position[i/8][i%8] = "P"
+		} else if ((board.bitboards[WN] >> i) & 1) == 1 {
+			position[i/8][i%8] = "N"
+		} else if ((board.bitboards[WB] >> i) & 1) == 1 {
+			position[i/8][i%8] = "B"
+		} else if ((board.bitboards[WR] >> i) & 1) == 1 {
+			position[i/8][i%8] = "R"
+		} else if ((board.bitboards[WQ] >> i) & 1) == 1 {
+			position[i/8][i%8] = "Q"
+		} else if ((board.bitboards[WK] >> i) & 1) == 1 {
+			position[i/8][i%8] = "K"
+		} else if ((board.bitboards[BP] >> i) & 1) == 1 {
+			position[i/8][i%8] = "p"
+		} else if ((board.bitboards[BN] >> i) & 1) == 1 {
+			position[i/8][i%8] = "n"
+		} else if ((board.bitboards[BB] >> i) & 1) == 1 {
+			position[i/8][i%8] = "b"
+		} else if ((board.bitboards[BR] >> i) & 1) == 1 {
+			position[i/8][i%8] = "r"
+		} else if ((board.bitboards[BQ] >> i) & 1) == 1 {
+			position[i/8][i%8] = "q"
+		} else if ((board.bitboards[BK] >> i) & 1) == 1 {
+			position[i/8][i%8] = "k"
+		} else {
+			position[i/8][i%8] = "."
 		}
 	}
 
 	var positionStr string
-	positionStr += "\n\n    \u05c0 "
-	startFileIdx := "A"[0]
-	for i := startFileIdx; i < startFileIdx+8; i++ {
-		positionStr += fmt.Sprintf("%s \u05c0 ", string(i))
-	}
-	positionStr += fmt.Sprintf("\n")
-
+	positionStr += "\n"
 	for idx, rank := range position {
-		positionStr += fmt.Sprintf("    ________________________________\n")
-		// positionStr += fmt.Sprintf("\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\u2796\n")
-		positionStr += fmt.Sprintf(" %d  \u05c0", (8 - idx))
-		// for _, file := range rank {
-		for i := (8 - 1); i >= 0; i-- {
-			positionStr += fmt.Sprintf(" %s \u05c0", rank[i]) // \u05c0
+		positionStr += fmt.Sprintf(" %d  ", (8 - idx))
+		for _, file := range rank {
+			positionStr += fmt.Sprintf(" %s ", file)
 		}
 		positionStr += "\n"
 	}
-	positionStr += fmt.Sprintf("    ________________________________\n")
-
-	// positionStr += "   \u05c0 "
-	// for i := startFileIdx; i < startFileIdx+8; i++ {
-	// 	positionStr += fmt.Sprintf("%s \u05c0 ", string(i))
-	// }
+	positionStr += "\n     "
+	startFileIdx := "A"[0]
+	for i := startFileIdx; i < startFileIdx+8; i++ {
+		positionStr += fmt.Sprintf("%s  ", string(i))
+	}
 	positionStr += fmt.Sprintf("\n")
 
 	return positionStr
-}
-
-func (board *Board) PrintBoard() {
-	var position [8][8]string
-
-	for i := 0; i < 64; i++ {
-		position[i/8][i%8] = " "
-	}
-
-	for i := 0; i < 64; i++ {
-		if ((board.bitboards[WP] >> i) & 1) == 1 {
-			position[i/8][i%8] = "P" // P
-		}
-		if ((board.bitboards[WN] >> i) & 1) == 1 {
-			position[i/8][i%8] = "N" // N
-		}
-		if ((board.bitboards[WB] >> i) & 1) == 1 {
-			position[i/8][i%8] = "B" // B
-		}
-		if ((board.bitboards[WR] >> i) & 1) == 1 {
-			position[i/8][i%8] = "R" // R
-		}
-		if ((board.bitboards[WQ] >> i) & 1) == 1 {
-			position[i/8][i%8] = "Q" // Q
-		}
-		if ((board.bitboards[WK] >> i) & 1) == 1 {
-			position[i/8][i%8] = "K" // K
-		}
-		if ((board.bitboards[BP] >> i) & 1) == 1 {
-			position[i/8][i%8] = "p" // p
-		}
-		if ((board.bitboards[BN] >> i) & 1) == 1 {
-			position[i/8][i%8] = "n" // n
-		}
-		if ((board.bitboards[BB] >> i) & 1) == 1 {
-			position[i/8][i%8] = "b" // b
-		}
-		if ((board.bitboards[BR] >> i) & 1) == 1 {
-			position[i/8][i%8] = "r" // r
-		}
-		if ((board.bitboards[BQ] >> i) & 1) == 1 {
-			position[i/8][i%8] = "q" // q
-		}
-		if ((board.bitboards[BK] >> i) & 1) == 1 {
-			position[i/8][i%8] = "k" // k
-		}
-	}
-
-	var positionStr string
-	for _, rank := range position {
-		positionStr += fmt.Sprint(rank)
-		positionStr += "\n"
-	}
-	positionStr += fmt.Sprintf("\n")
-	fmt.Println(positionStr)
 }
 
 // PrintBitboards Outputs all internal bitboards in an easy to view way

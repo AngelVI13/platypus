@@ -8,11 +8,11 @@ import (
 func TestLegalMovesWhite(t *testing.T) {
 	InitHashKeys()
 	board := Board{}
-	board.ParseFen("5kq1/2b5/8/4pP2/2K5/8/8/8 w - e6 0 1")
+	board.ParseFen("4K3/8/4R3/8/8/4q3/2k5/8 w - - 0 1")
+	// board.ParseFen("5kq1/2b5/8/4pP2/2K5/8/8/8 w - e6 0 1")
 	// board.ParseFen(StartingPosition)
 
 	fmt.Println(&board)
-	board.PrintBoard()
 	var moveList MoveList
 	board.LegalMovesWhite(&moveList)
 	PrintMoveList(&moveList)

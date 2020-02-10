@@ -152,6 +152,112 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 	panic("Could not generate rays.")
 }
 
+// getPinnedPieceRays Get diagonal and horizontal rays that represent a pinned piece and its only available moves.
+// Ray does not include king
+func (board *Board) getPinnedPieceRays(kingBitboard uint64) uint64 {
+	var rays uint64
+	kingIdx := bits.TrailingZeros64(kingBitboard)
+
+	rays = 0
+	newSquare := kingIdx
+	// generate file ray to the right
+	for (rays&checkerBitboard == 0) && (newSquare+1)%8 != 0 {
+		newSquare++
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	rays = 0
+	newSquare = kingIdx
+	// generate file ray to the left
+	for (rays&checkerBitboard == 0) && (newSquare)%8 != 0 {
+		newSquare--
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	rays = 0
+	newSquare = kingIdx
+	// generate rank ray upwards
+	for (rays&checkerBitboard == 0) && (newSquare-8) > 0 {
+		newSquare -= 8
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	rays = 0
+	newSquare = kingIdx
+	// generate rank ray down
+	for (rays&checkerBitboard == 0) && (newSquare+8) < 64 {
+		newSquare += 8
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	rays = 0
+	newSquare = kingIdx
+	// generate left diagonal down
+	for (rays&checkerBitboard == 0) && (newSquare+9) < 64 {
+		newSquare += 9
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	rays = 0
+	newSquare = kingIdx
+	// generate left diagonal up
+	for (rays&checkerBitboard == 0) && (newSquare-9) > 0 {
+		newSquare -= 9
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	rays = 0
+	newSquare = kingIdx
+	// generate right diagonal down
+	for (rays&checkerBitboard == 0) && (newSquare+7) < 64 {
+		newSquare += 7
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	rays = 0
+	newSquare = kingIdx
+	// generate left diagonal up
+	for (rays&checkerBitboard == 0) && (newSquare-7) > 0 {
+		newSquare -= 7
+		rays |= (1 << newSquare)
+		if rays&checkerBitboard != 0 {
+			rays ^= checkerBitboard // remove checker square from ray and return rays
+			return rays
+		}
+	}
+
+	// if we haven't returned by now -> couldn't generate rays
+	panic("Could not generate rays.")
+}
+
 // LegalMovesWhite Generates all legal moves for white
 func (board *Board) LegalMovesWhite(moveList *MoveList) {
 	board.UpdateBitMasks()
@@ -179,7 +285,6 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 		// iterate over bitboards to find out what piece type is the checking piece
 		for pieceType, bitboard := range board.bitboards {
 			if bitboard&checkers != 0 && IsSlider[pieceType] {
-				fmt.Println(pieceType)
 				// the push mask is limited to squares between the king and the piece giving check
 				pushMask = getCheckerSliderRaysToKing(board.bitboards[WK], checkers)
 				break
@@ -192,10 +297,15 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 		}
 	}
 
-	fmt.Println("One or 0 checkers")
+	fmt.Println("1 or 0 checkers")
 	DrawBitboard(checkers)
 	DrawBitboard(captureMask)
 	DrawBitboard(pushMask)
+
+	blackQueenIdx := bits.TrailingZeros64(board.bitboards[BQ])
+	possibilities := board.HorizontalAndVerticalMoves(blackQueenIdx, board.stateBoards[Occupied])
+	possibilities |= board.DiagonalAndAntiDiagonalMoves(blackQueenIdx, board.stateBoards[Occupied])
+	DrawBitboard(possibilities)
 
 	board.possibleWhitePawn(moveList, pushMask, captureMask)
 	// board.possibleKnightMoves(moveList, board.bitboards[WN], WN)
