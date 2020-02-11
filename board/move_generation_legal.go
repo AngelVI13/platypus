@@ -79,7 +79,7 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 	rays = 0
 	newSquare = kingIdx
 	// generate rank ray upwards
-	for (rays&checkerBitboard == 0) && (newSquare-8) > 0 {
+	for (rays&checkerBitboard == 0) && (newSquare-8) >= 0 {
 		newSquare -= 8
 		rays |= (1 << newSquare)
 		if rays&checkerBitboard != 0 {
@@ -115,7 +115,7 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 	rays = 0
 	newSquare = kingIdx
 	// generate left diagonal up
-	for (rays&checkerBitboard == 0) && (newSquare-9) > 0 {
+	for (rays&checkerBitboard == 0) && (newSquare-9) >= 0 {
 		newSquare -= 9
 		rays |= (1 << newSquare)
 		if rays&checkerBitboard != 0 {
@@ -139,7 +139,7 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 	rays = 0
 	newSquare = kingIdx
 	// generate left diagonal up
-	for (rays&checkerBitboard == 0) && (newSquare-7) > 0 {
+	for (rays&checkerBitboard == 0) && (newSquare-7) >= 0 {
 		newSquare -= 7
 		rays |= (1 << newSquare)
 		if rays&checkerBitboard != 0 {
@@ -154,108 +154,171 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 
 // getPinnedPieceRays Get diagonal and horizontal rays that represent a pinned piece and its only available moves.
 // Ray does not include king
-func (board *Board) getPinnedPieceRays(kingBitboard uint64) uint64 {
-	var rays uint64
+func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
+	var rays [8]uint64
+	var ray uint64
+	var numPinnedPieces int
+	var pinnedRayCount int
+
 	kingIdx := bits.TrailingZeros64(kingBitboard)
+	enemySlidingPieces := board.stateBoards[EnemyRooksQueens] | board.stateBoards[EnemyBishopsQueens]
+	myPieces := board.stateBoards[MyPieces]
 
-	rays = 0
+	ray = 0
 	newSquare := kingIdx
+	numPinnedPieces = 0
 	// generate file ray to the right
-	for (rays&checkerBitboard == 0) && (newSquare+1)%8 != 0 {
+	// if there are more than 1 piece between my king and an enemy slider
+	// -> not a pinned piece
+	for (ray&enemySlidingPieces == 0) && (newSquare+1)%8 != 0 && numPinnedPieces <= 1 {
 		newSquare++
-		rays |= (1 << newSquare)
-		if rays&checkerBitboard != 0 {
-			rays ^= checkerBitboard // remove checker square from ray and return rays
-			return rays
+		ray |= (1 << newSquare)
+		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+			rays[pinnedRayCount] = ray
+			pinnedRayCount++
+			break
+		}
+
+		if ray&myPieces != 0 {
+			numPinnedPieces++
+			myPieces ^= ray & myPieces // remove identified piece from myPieces
 		}
 	}
 
-	rays = 0
+	ray = 0
 	newSquare = kingIdx
+	numPinnedPieces = 0
 	// generate file ray to the left
-	for (rays&checkerBitboard == 0) && (newSquare)%8 != 0 {
+	for (ray&enemySlidingPieces == 0) && (newSquare)%8 != 0 && numPinnedPieces <= 1 {
 		newSquare--
-		rays |= (1 << newSquare)
-		if rays&checkerBitboard != 0 {
-			rays ^= checkerBitboard // remove checker square from ray and return rays
-			return rays
+		ray |= (1 << newSquare)
+		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+			rays[pinnedRayCount] = ray
+			pinnedRayCount++
+			break
+		}
+
+		if ray&myPieces != 0 {
+			numPinnedPieces++
+			myPieces ^= ray & myPieces // remove identified piece from myPieces
 		}
 	}
 
-	rays = 0
+	ray = 0
 	newSquare = kingIdx
+	numPinnedPieces = 0
 	// generate rank ray upwards
-	for (rays&checkerBitboard == 0) && (newSquare-8) > 0 {
+	for (ray&enemySlidingPieces == 0) && (newSquare-8) >= 0 && numPinnedPieces <= 1 {
 		newSquare -= 8
-		rays |= (1 << newSquare)
-		if rays&checkerBitboard != 0 {
-			rays ^= checkerBitboard // remove checker square from ray and return rays
-			return rays
+		ray |= (1 << newSquare)
+		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+			rays[pinnedRayCount] = ray
+			pinnedRayCount++
+			break
+		}
+
+		if ray&myPieces != 0 {
+			numPinnedPieces++
+			myPieces ^= ray & myPieces // remove identified piece from myPieces
 		}
 	}
 
-	rays = 0
+	ray = 0
 	newSquare = kingIdx
+	numPinnedPieces = 0
 	// generate rank ray down
-	for (rays&checkerBitboard == 0) && (newSquare+8) < 64 {
+	for (ray&enemySlidingPieces == 0) && (newSquare+8) < 64 && numPinnedPieces <= 1 {
 		newSquare += 8
-		rays |= (1 << newSquare)
-		if rays&checkerBitboard != 0 {
-			rays ^= checkerBitboard // remove checker square from ray and return rays
-			return rays
+		ray |= (1 << newSquare)
+		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+			rays[pinnedRayCount] = ray
+			pinnedRayCount++
+			break
+		}
+
+		if ray&myPieces != 0 {
+			numPinnedPieces++
+			myPieces ^= ray & myPieces // remove identified piece from myPieces
 		}
 	}
 
-	rays = 0
+	ray = 0
 	newSquare = kingIdx
+	numPinnedPieces = 0
 	// generate left diagonal down
-	for (rays&checkerBitboard == 0) && (newSquare+9) < 64 {
+	for (ray&enemySlidingPieces == 0) && (newSquare+9) < 64 && numPinnedPieces <= 1 {
 		newSquare += 9
-		rays |= (1 << newSquare)
-		if rays&checkerBitboard != 0 {
-			rays ^= checkerBitboard // remove checker square from ray and return rays
-			return rays
+		ray |= (1 << newSquare)
+		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+			rays[pinnedRayCount] = ray
+			pinnedRayCount++
+			break
+		}
+
+		if ray&myPieces != 0 {
+			numPinnedPieces++
+			myPieces ^= ray & myPieces // remove identified piece from myPieces
 		}
 	}
 
-	rays = 0
+	ray = 0
 	newSquare = kingIdx
+	numPinnedPieces = 0
 	// generate left diagonal up
-	for (rays&checkerBitboard == 0) && (newSquare-9) > 0 {
+	for (ray&enemySlidingPieces == 0) && (newSquare-9) >= 0 && numPinnedPieces <= 1 {
 		newSquare -= 9
-		rays |= (1 << newSquare)
-		if rays&checkerBitboard != 0 {
-			rays ^= checkerBitboard // remove checker square from ray and return rays
-			return rays
+		ray |= (1 << newSquare)
+		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+			rays[pinnedRayCount] = ray
+			pinnedRayCount++
+			break
+		}
+
+		if ray&myPieces != 0 {
+			numPinnedPieces++
+			myPieces ^= ray & myPieces // remove identified piece from myPieces
 		}
 	}
 
-	rays = 0
+	ray = 0
 	newSquare = kingIdx
+	numPinnedPieces = 0
 	// generate right diagonal down
-	for (rays&checkerBitboard == 0) && (newSquare+7) < 64 {
+	for (ray&enemySlidingPieces == 0) && (newSquare+7) < 64 && numPinnedPieces <= 1 {
 		newSquare += 7
-		rays |= (1 << newSquare)
-		if rays&checkerBitboard != 0 {
-			rays ^= checkerBitboard // remove checker square from ray and return rays
-			return rays
+		ray |= (1 << newSquare)
+		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+			rays[pinnedRayCount] = ray
+			pinnedRayCount++
+			break
+		}
+
+		if ray&myPieces != 0 {
+			numPinnedPieces++
+			myPieces ^= ray & myPieces // remove identified piece from myPieces
 		}
 	}
 
-	rays = 0
+	ray = 0
 	newSquare = kingIdx
+	numPinnedPieces = 0
 	// generate left diagonal up
-	for (rays&checkerBitboard == 0) && (newSquare-7) > 0 {
+	for (ray&enemySlidingPieces == 0) && (newSquare-7) >= 0 && numPinnedPieces <= 1 {
 		newSquare -= 7
-		rays |= (1 << newSquare)
-		if rays&checkerBitboard != 0 {
-			rays ^= checkerBitboard // remove checker square from ray and return rays
-			return rays
+		ray |= (1 << newSquare)
+		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+			rays[pinnedRayCount] = ray
+			pinnedRayCount++
+			break
+		}
+
+		if ray&myPieces != 0 {
+			numPinnedPieces++
+			myPieces ^= ray & myPieces // remove identified piece from myPieces
 		}
 	}
 
-	// if we haven't returned by now -> couldn't generate rays
-	panic("Could not generate rays.")
+	return rays
 }
 
 // LegalMovesWhite Generates all legal moves for white

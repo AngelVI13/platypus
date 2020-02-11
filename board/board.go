@@ -44,6 +44,9 @@ const (
 	// NotMyPieces index to bitboard with all enemy and empty squares
 	NotMyPieces int = iota
 
+	// MyPieces index to bitboard with all my pieces excluding my king
+	MyPieces int = iota
+
 	// EnemyPieces index to bitboard with all the squares of enemy pieces
 	EnemyPieces
 
@@ -122,7 +125,7 @@ type Undo struct {
 // Board Struct to represent the chess board
 type Board struct {
 	bitboards         [13]uint64
-	stateBoards       [9]uint64 // bitboards representing a state i.e. EnemyPieces, Empty, Occupied etc.
+	stateBoards       [10]uint64 // bitboards representing a state i.e. EnemyPieces, Empty, Occupied etc.
 	Side              int
 	castlePermissions int
 	ply               int                // how many half moves have been made
@@ -242,6 +245,12 @@ func (board *Board) UpdateBitMasks() {
 			board.bitboards[WK] |
 			board.bitboards[BK])
 
+		board.stateBoards[MyPieces] = (board.bitboards[WP] |
+			board.bitboards[WN] |
+			board.bitboards[WB] |
+			board.bitboards[WR] |
+			board.bitboards[WQ])
+
 		board.stateBoards[EnemyPieces] = (board.bitboards[BP] |
 			board.bitboards[BN] |
 			board.bitboards[BB] |
@@ -276,6 +285,12 @@ func (board *Board) UpdateBitMasks() {
 			board.bitboards[BQ] |
 			board.bitboards[BK] |
 			board.bitboards[WK])
+
+		board.stateBoards[MyPieces] = (board.bitboards[BP] |
+			board.bitboards[BN] |
+			board.bitboards[BB] |
+			board.bitboards[BR] |
+			board.bitboards[BQ])
 
 		board.stateBoards[EnemyPieces] = (board.bitboards[WP] |
 			board.bitboards[WN] |

@@ -21,6 +21,19 @@ func TestLegalMovesWhite(t *testing.T) {
 	t.Errorf("Error")
 }
 
+func TestGetPinnedPieceRays(t *testing.T) {
+	InitHashKeys()
+	board := Board{}
+	board.ParseFen("q2q2q1/8/2RRR3/q1RKR2q/2RRR3/8/q1kq2q1/8 w - - 0 1")
+	board.UpdateBitMasks()
+
+	rays := board.getPinnedPieceRays(board.bitboards[WK])
+	for _, ray := range rays {
+		DrawBitboard(ray)
+	}
+	t.Errorf("Error")
+}
+
 func TestGetCheckerSliderRaysToKing(t *testing.T) {
 	var kingBitboard uint64 = (1 << 3)
 	var checkerBitboard uint64 = (1 << 24)
