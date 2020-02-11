@@ -49,11 +49,36 @@ func BenchmarkGetCheckers(b *testing.B) {
 	InitHashKeys()
 	board := Board{}
 	board.ParseFen("8/2k1r3/1b6/5nb1/2nP4/4K3/8/8 w - - 0 1")
+	board.UpdateBitMasks()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		board.getCheckers(board.bitboards[WK])
+	}
+	b.StopTimer()
+}
+
+func BenchmarkGetPinnedRays(b *testing.B) {
+	InitHashKeys()
+	board := Board{}
+	board.ParseFen("q2q2q1/8/2RRR3/q1RKR2q/2RRR3/8/q1kq2q1/8 w - - 0 1")
+	board.UpdateBitMasks()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		board.getPinnedPieceRays(board.bitboards[WK])
+	}
+	b.StopTimer()
+}
+
+func BenchmarkUpdateBitMasks(b *testing.B) {
+	InitHashKeys()
+	board := Board{}
+	board.ParseFen(StartingPosition)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		board.UpdateBitMasks()
-		board.getCheckers(board.bitboards[WK])
 	}
 	b.StopTimer()
 }
