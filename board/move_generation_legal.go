@@ -356,7 +356,7 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 	DrawBitboard(pushMask)
 	board.getPinnedPieceRays(board.bitboards[WK], &pinRays)
 
-	board.possibleWhitePawn(moveList, pushMask, captureMask)
+	board.possibleWhitePawn(moveList, pushMask, captureMask, &pinRays)
 	board.possibleKnightMoves(moveList, board.bitboards[WN], WN, pushMask, captureMask, &pinRays)
 	// board.possibleBishopMoves(moveList, board.bitboards[WB], WB)
 	// board.possibleRookMoves(moveList, board.bitboards[WR], WR)
@@ -365,7 +365,7 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 	// board.possibleCastleWhite(moveList)
 }
 
-func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask uint64) {
+func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask uint64, pinRays *PinRays) {
 	wp := board.bitboards[WP]
 	enemyPieces := board.stateBoards[EnemyPieces]
 	empty := board.stateBoards[Empty]
@@ -392,10 +392,10 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	// captures and moves formward forward
 
 	// capture right
-	pawnMoves = (wp >> 7) & enemyPieces & (^Rank8) & (^FileA)
+	pawnMoves = (wp >> 7) & enemyPieces & (^Rank8) & (^FileA) & captureMask
 	// Find first bit which is equal to '1' i.e. first capture
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&captureMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		moveList.AddMove(GetMoveInt(index+7, index, WP, 0, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
@@ -403,9 +403,9 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	}
 
 	// capture left
-	pawnMoves = (wp >> 9) & enemyPieces & (^Rank8) & (^FileH)
+	pawnMoves = (wp >> 9) & enemyPieces & (^Rank8) & (^FileH) & captureMask
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&captureMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		moveList.AddMove(GetMoveInt(index+9, index, WP, 0, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
@@ -413,9 +413,9 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	}
 
 	// move 1 square forward
-	pawnMoves = (wp >> 8) & empty & (^Rank8)
+	pawnMoves = (wp >> 8) & empty & (^Rank8) & pushMask
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&pushMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		moveList.AddMove(GetMoveInt(index+8, index, WP, 0, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
@@ -425,9 +425,9 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	// Move all pawns 2 ranks, check that, in between and on the final square there is nothing,
 	// also check that resulting square is on rank4.
 	// (instead of check I mean eliminate squares that do not comply with these conditions)
-	pawnMoves = (wp >> 16) & empty & (empty >> 8) & Rank4
+	pawnMoves = (wp >> 16) & empty & (empty >> 8) & Rank4 & pushMask
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&pushMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		moveList.AddMove(GetMoveInt(index+16, index, WP, 0, MoveFlagPawnStart))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
@@ -436,9 +436,9 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 
 	// promotions
 	// pawn promotion by capture right
-	pawnMoves = (wp >> 7) & enemyPieces & Rank8 & (^FileA)
+	pawnMoves = (wp >> 7) & enemyPieces & Rank8 & (^FileA) & captureMask
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&captureMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		// todo maybe Capture flag??
 		moveList.AddMove(GetMoveInt(index+7, index, WP, WQ, NoFlag))
@@ -450,9 +450,9 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	}
 
 	// pawn promotion by capture left
-	pawnMoves = (wp >> 9) & enemyPieces & Rank8 & (^FileH)
+	pawnMoves = (wp >> 9) & enemyPieces & Rank8 & (^FileH) & captureMask
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&captureMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		// todo maybe Capture flag??
 		moveList.AddMove(GetMoveInt(index+9, index, WP, WQ, NoFlag))
@@ -463,9 +463,10 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
 
-	pawnMoves = (wp >> 8) & empty & Rank8 // pawn promotion by move 1 forward
+	// pawn promotion by move 1 forward
+	pawnMoves = (wp >> 8) & empty & Rank8 & pushMask
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&pushMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		moveList.AddMove(GetMoveInt(index+8, index, WP, WQ, NoFlag))
 		moveList.AddMove(GetMoveInt(index+8, index, WP, WR, NoFlag))
@@ -492,7 +493,7 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	}
 }
 
-func (board *Board) possibleBlackPawn(moveList *MoveList, pushMask, captureMask uint64) {
+func (board *Board) possibleBlackPawn(moveList *MoveList, pushMask, captureMask uint64, pinRays *PinRays) {
 	bp := board.bitboards[BP]
 	enemyPieces := board.stateBoards[EnemyPieces]
 	empty := board.stateBoards[Empty]
@@ -502,10 +503,10 @@ func (board *Board) possibleBlackPawn(moveList *MoveList, pushMask, captureMask 
 
 	// captures and moves formward forward:
 	// capture right
-	pawnMoves = (bp << 7) & enemyPieces & (^Rank1) & (^FileH)
+	pawnMoves = (bp << 7) & enemyPieces & (^Rank1) & (^FileH) & captureMask
 	// Find first bit which is equal to '1' i.e. first capture
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&captureMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		moveList.AddMove(GetMoveInt(index-7, index, BP, 0, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
@@ -513,9 +514,9 @@ func (board *Board) possibleBlackPawn(moveList *MoveList, pushMask, captureMask 
 	}
 
 	// capture left
-	pawnMoves = (bp << 9) & enemyPieces & (^Rank1) & (^FileA)
+	pawnMoves = (bp << 9) & enemyPieces & (^Rank1) & (^FileA) & captureMask
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&captureMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		moveList.AddMove(GetMoveInt(index-9, index, BP, 0, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
@@ -523,9 +524,9 @@ func (board *Board) possibleBlackPawn(moveList *MoveList, pushMask, captureMask 
 	}
 
 	// move 1 square forward
-	pawnMoves = (bp << 8) & empty & (^Rank1)
+	pawnMoves = (bp << 8) & empty & (^Rank1) & pushMask
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&pushMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		moveList.AddMove(GetMoveInt(index-8, index, BP, 0, NoFlag))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
@@ -535,9 +536,9 @@ func (board *Board) possibleBlackPawn(moveList *MoveList, pushMask, captureMask 
 	// Move all pawns 2 ranks, check that, in between and on the final square there is nothing,
 	// also check that resulting square is on rank4.
 	// (instead of check I mean eliminate squares that do not comply with these conditions)
-	pawnMoves = (bp << 16) & empty & (empty << 8) & Rank5
+	pawnMoves = (bp << 16) & empty & (empty << 8) & Rank5 & pushMask
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&pushMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		moveList.AddMove(GetMoveInt(index-16, index, BP, 0, MoveFlagPawnStart))
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
@@ -546,9 +547,9 @@ func (board *Board) possibleBlackPawn(moveList *MoveList, pushMask, captureMask 
 
 	// promotions
 	// pawn promotion by capture right
-	pawnMoves = (bp << 7) & enemyPieces & Rank1 & (^FileH)
+	pawnMoves = (bp << 7) & enemyPieces & Rank1 & (^FileH) & captureMask
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&captureMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		// todo maybe Capture flag??
 		moveList.AddMove(GetMoveInt(index-7, index, BP, BQ, NoFlag))
@@ -560,9 +561,9 @@ func (board *Board) possibleBlackPawn(moveList *MoveList, pushMask, captureMask 
 	}
 
 	// pawn promotion by capture left
-	pawnMoves = (bp << 9) & enemyPieces & Rank1 & (^FileA)
+	pawnMoves = (bp << 9) & enemyPieces & Rank1 & (^FileA) & captureMask
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&captureMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		// todo maybe Capture flag??
 		moveList.AddMove(GetMoveInt(index-9, index, BP, BQ, NoFlag))
@@ -573,9 +574,10 @@ func (board *Board) possibleBlackPawn(moveList *MoveList, pushMask, captureMask 
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
 
-	pawnMoves = (bp << 8) & empty & Rank1 // pawn promotion by move 1 forward
+	// pawn promotion by move 1 forward
+	pawnMoves = (bp << 8) & empty & Rank1 & pushMask
 	possibility = pawnMoves & (^(pawnMoves - 1))
-	for possibility != 0 && (possibility&pushMask) != 0 {
+	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
 		moveList.AddMove(GetMoveInt(index-8, index, BP, BQ, NoFlag))
 		moveList.AddMove(GetMoveInt(index-8, index, BP, BR, NoFlag))
