@@ -330,170 +330,6 @@ func (board *Board) DiagonalAndAntiDiagonalMoves(square int, occupied uint64) ui
 // 	}
 // }
 
-// func (board *Board) possibleKnightMoves(moveList *MoveList, knight uint64, pieceType int) {
-// 	// Choose bishop
-// 	knightPossibility := knight & (^(knight - 1))
-// 	var possibility uint64
-
-// 	for knightPossibility != 0 {
-// 		// Current knight index (in bitmask)
-// 		knightIdx := bits.TrailingZeros64(knightPossibility)
-
-// 		// Move knight pattern mask around depending on the current knight position idx
-// 		// KnightSpan is a predefined knight move pattern such as
-// 		// [               ]
-// 		// [               ]
-// 		// [               ]
-// 		// [        X   X  ]
-// 		// [      X       X]
-// 		// [          O    ]
-// 		// [      X       X]
-// 		// [        X   X  ]
-// 		if knightIdx > 18 {
-// 			possibility = KnightSpan << (knightIdx - 18)
-// 		} else {
-// 			possibility = KnightSpan >> (18 - knightIdx)
-// 		}
-
-// 		// handle wrap around of knight pattern movement
-// 		if knightIdx%8 < 4 {
-// 			possibility &= (^FileGH) & NotMyPieces
-// 		} else {
-// 			possibility &= (^FileAB) & NotMyPieces
-// 		}
-
-// 		// choose move
-// 		movePossibility := possibility & (^(possibility - 1))
-// 		for movePossibility != 0 {
-// 			// possible move index (in bitmask)
-// 			moveIndex := bits.TrailingZeros64(movePossibility)
-// 			moveList.AddMove(GetMoveInt(knightIdx, moveIndex, pieceType, 0, NoFlag))
-// 			possibility &= ^movePossibility                      // remove move from all possible moves
-// 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
-// 		}
-// 		knight &= ^knightPossibility
-// 		knightPossibility = knight & (^(knight - 1))
-// 	}
-// }
-
-// func (board *Board) possibleBishopMoves(moveList *MoveList, bishop uint64, pieceType int) {
-// 	// Choose bishop
-// 	bishopPossibility := bishop & (^(bishop - 1))
-// 	var possibility uint64
-
-// 	for bishopPossibility != 0 {
-// 		// Current bishop index (in bitmask)
-// 		bishopIdx := bits.TrailingZeros64(bishopPossibility)
-// 		possibility = board.DiagonalAndAntiDiagonalMoves(bishopIdx) & NotMyPieces
-
-// 		// choose move
-// 		movePossibility := possibility & (^(possibility - 1))
-// 		for movePossibility != 0 {
-// 			// possible move index (in bitmask)
-// 			moveIndex := bits.TrailingZeros64(movePossibility)
-// 			moveList.AddMove(GetMoveInt(bishopIdx, moveIndex, pieceType, 0, NoFlag))
-// 			possibility &= ^movePossibility                      // remove move from all possible moves
-// 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
-// 		}
-// 		bishop &= ^bishopPossibility
-// 		bishopPossibility = bishop & (^(bishop - 1))
-// 	}
-// }
-
-// func (board *Board) possibleRookMoves(moveList *MoveList, rook uint64, pieceType int) {
-// 	// Choose rook
-// 	rookPossibility := rook & (^(rook - 1))
-// 	var possibility uint64
-
-// 	for rookPossibility != 0 {
-// 		// Current rook index (in bitmask)
-// 		rookIdx := bits.TrailingZeros64(rookPossibility)
-// 		possibility = board.HorizontalAndVerticalMoves(rookIdx) & NotMyPieces
-
-// 		// choose move
-// 		movePossibility := possibility & (^(possibility - 1))
-// 		for movePossibility != 0 {
-// 			// possible move index (in bitmask)
-// 			moveIndex := bits.TrailingZeros64(movePossibility)
-// 			moveList.AddMove(GetMoveInt(rookIdx, moveIndex, pieceType, 0, NoFlag))
-// 			possibility &= ^movePossibility                      // remove move from all possible moves
-// 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
-// 		}
-// 		rook &= ^rookPossibility
-// 		rookPossibility = rook & (^(rook - 1))
-// 	}
-// }
-
-// func (board *Board) possibleQueenMoves(moveList *MoveList, queen uint64, pieceType int) {
-// 	// Choose queen
-// 	queenPossibility := queen & (^(queen - 1))
-// 	var possibility uint64
-
-// 	for queenPossibility != 0 {
-// 		// Current queen index (in bitmask)
-// 		queenIdx := bits.TrailingZeros64(queenPossibility)
-// 		possibility = (board.HorizontalAndVerticalMoves(queenIdx) | board.DiagonalAndAntiDiagonalMoves(queenIdx)) & NotMyPieces
-
-// 		// choose move
-// 		movePossibility := possibility & (^(possibility - 1))
-// 		for movePossibility != 0 {
-// 			// possible move index (in bitmask)
-// 			moveIndex := bits.TrailingZeros64(movePossibility)
-// 			moveList.AddMove(GetMoveInt(queenIdx, moveIndex, pieceType, 0, NoFlag))
-// 			possibility &= ^movePossibility                      // remove move from all possible moves
-// 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
-// 		}
-// 		queen &= ^queenPossibility
-// 		queenPossibility = queen & (^(queen - 1))
-// 	}
-// }
-
-func (board *Board) possibleKingMoves(moveList *MoveList, king uint64, pieceType int) {
-	var possibility uint64
-
-	// Current king index (in bitmask)
-	kingIdx := bits.TrailingZeros64(king)
-
-	possibility = KingMoves[kingIdx] & board.stateBoards[NotMyPieces] & ^board.stateBoards[Unsafe]
-
-	// choose move
-	movePossibility := possibility & (^(possibility - 1))
-	for movePossibility != 0 {
-		// possible move index (in bitmask)
-		moveIndex := bits.TrailingZeros64(movePossibility)
-		moveList.AddMove(GetMoveInt(kingIdx, moveIndex, pieceType, 0, NoFlag))
-		possibility &= ^movePossibility                      // remove move from all possible moves
-		movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
-	}
-}
-
-// func (board *Board) possibleCastleWhite(moveList *MoveList) {
-// 	kingIdx := bits.TrailingZeros64(board.bitboards[WK])
-// 	var queenSideSqBitboard uint64 = 1<<(kingIdx-1) | 1<<(kingIdx-2)
-// 	var kingSideSqBitboard uint64 = 1<<(kingIdx+1) | 1<<(kingIdx+2)
-
-// 	// todo replace hardcoded squares with consts
-// 	if (board.castlePermissions&WhiteKingCastling) != 0 && (bits.OnesCount64((kingSideSqBitboard|board.bitboards[WK]) & ^Unsafe) == 3) && (bits.OnesCount64(Empty&kingSideSqBitboard) == 2) {
-// 		moveList.AddMove(GetMoveInt(60, 62, WK, 0, MoveFlagCastle))
-// 	}
-// 	if (board.castlePermissions&WhiteQueenCastling) != 0 && (bits.OnesCount64((queenSideSqBitboard|board.bitboards[WK]) & ^Unsafe) == 3) && (bits.OnesCount64(Empty&(queenSideSqBitboard|1<<(kingIdx-3))) == 3) { // on the queen side there are 3 sq that should be empty to enable castling
-// 		moveList.AddMove(GetMoveInt(60, 58, WK, 0, MoveFlagCastle))
-// 	}
-// }
-
-// func (board *Board) possibleCastleBlack(moveList *MoveList) {
-// 	kingIdx := bits.TrailingZeros64(board.bitboards[BK])
-// 	var queenSideSqBitboard uint64 = 1<<(kingIdx-1) | 1<<(kingIdx-2)
-// 	var kingSideSqBitboard uint64 = 1<<(kingIdx+1) | 1<<(kingIdx+2)
-
-// 	if (board.castlePermissions&BlackKingCastling) != 0 && (bits.OnesCount64((kingSideSqBitboard|board.bitboards[BK]) & ^Unsafe) == 3) && (bits.OnesCount64(Empty&kingSideSqBitboard) == 2) {
-// 		moveList.AddMove(GetMoveInt(4, 6, BK, 0, MoveFlagCastle))
-// 	}
-// 	if (board.castlePermissions&BlackQueenCastling) != 0 && (bits.OnesCount64((queenSideSqBitboard|board.bitboards[BK]) & ^Unsafe) == 3) && (bits.OnesCount64(Empty&(queenSideSqBitboard|1<<(kingIdx-3))) == 3) {
-// 		moveList.AddMove(GetMoveInt(4, 2, BK, 0, MoveFlagCastle))
-// 	}
-// }
-
 func (board *Board) unsafeForBlack() (unsafe uint64) {
 	// pawn
 	unsafe = ((board.bitboards[WP] >> 7) & (^FileA))  // pawn capture right
@@ -511,12 +347,14 @@ func (board *Board) unsafeForBlack() (unsafe uint64) {
 		i = wn & (^(wn - 1))
 	}
 
+	// sliding pieces
+	occupiedExludingKing := board.stateBoards[Occupied] ^ board.bitboards[BK]
 	// bishop/queen
 	qb := board.bitboards[WQ] | board.bitboards[WB]
 	i = qb & (^(qb - 1))
 	for i != 0 {
 		iLocation := bits.TrailingZeros64(i)
-		possibility = board.DiagonalAndAntiDiagonalMoves(iLocation, board.stateBoards[Occupied])
+		possibility = board.DiagonalAndAntiDiagonalMoves(iLocation, occupiedExludingKing)
 		unsafe |= possibility
 		qb &= (^i)
 		i = qb & (^(qb - 1))
@@ -527,7 +365,7 @@ func (board *Board) unsafeForBlack() (unsafe uint64) {
 	i = qr & (^(qr - 1))
 	for i != 0 {
 		iLocation := bits.TrailingZeros64(i)
-		possibility = board.HorizontalAndVerticalMoves(iLocation, board.stateBoards[Occupied])
+		possibility = board.HorizontalAndVerticalMoves(iLocation, occupiedExludingKing)
 		unsafe |= possibility
 		qr &= (^i)
 		i = qr & (^(qr - 1))
@@ -557,12 +395,18 @@ func (board *Board) unsafeForWhite() (unsafe uint64) {
 		i = bn & (^(bn - 1))
 	}
 
+	// sliding pieces
+	// when calculating unsafe squares for a given colour we need to exclude the
+	// current side's king because if an enemy queen is attacking our king,
+	// the squares behind the king are also unsafe, however, when the king is included
+	// geneation of unsafe squares will stop at the king and will not extend behind it
+	occupiedExludingKing := board.stateBoards[Occupied] ^ board.bitboards[WK]
 	// bishop/queen
 	qb := board.bitboards[BQ] | board.bitboards[BB]
 	i = qb & (^(qb - 1))
 	for i != 0 {
 		iLocation := bits.TrailingZeros64(i)
-		possibility = board.DiagonalAndAntiDiagonalMoves(iLocation, board.stateBoards[Occupied])
+		possibility = board.DiagonalAndAntiDiagonalMoves(iLocation, occupiedExludingKing)
 		unsafe |= possibility
 		qb &= (^i)
 		i = qb & (^(qb - 1))
@@ -573,7 +417,7 @@ func (board *Board) unsafeForWhite() (unsafe uint64) {
 	i = qr & (^(qr - 1))
 	for i != 0 {
 		iLocation := bits.TrailingZeros64(i)
-		possibility = board.HorizontalAndVerticalMoves(iLocation, board.stateBoards[Occupied])
+		possibility = board.HorizontalAndVerticalMoves(iLocation, occupiedExludingKing)
 		unsafe |= possibility
 		qr &= (^i)
 		i = qr & (^(qr - 1))

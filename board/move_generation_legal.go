@@ -161,7 +161,8 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 	var pinnedRayCount int
 
 	kingIdx := bits.TrailingZeros64(kingBitboard)
-	enemySlidingPieces := board.stateBoards[EnemyRooksQueens] | board.stateBoards[EnemyBishopsQueens]
+	enemyRooksQueens := board.stateBoards[EnemyRooksQueens]
+	enemyBishopsQueens := board.stateBoards[EnemyBishopsQueens]
 	myPieces := board.stateBoards[MyPieces]
 
 	ray = 0
@@ -170,10 +171,10 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 	// generate file ray to the right
 	// if there are more than 1 piece between my king and an enemy slider
 	// -> not a pinned piece
-	for (ray&enemySlidingPieces == 0) && (newSquare+1)%8 != 0 && numPinnedPieces <= 1 {
+	for (ray&enemyRooksQueens == 0) && (newSquare+1)%8 != 0 && numPinnedPieces <= 1 {
 		newSquare++
 		ray |= (1 << newSquare)
-		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+		if ray&enemyRooksQueens != 0 && numPinnedPieces == 1 {
 			rays[pinnedRayCount] = ray
 			pinnedRayCount++
 			break
@@ -189,10 +190,10 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 	newSquare = kingIdx
 	numPinnedPieces = 0
 	// generate file ray to the left
-	for (ray&enemySlidingPieces == 0) && (newSquare)%8 != 0 && numPinnedPieces <= 1 {
+	for (ray&enemyRooksQueens == 0) && (newSquare)%8 != 0 && numPinnedPieces <= 1 {
 		newSquare--
 		ray |= (1 << newSquare)
-		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+		if ray&enemyRooksQueens != 0 && numPinnedPieces == 1 {
 			rays[pinnedRayCount] = ray
 			pinnedRayCount++
 			break
@@ -208,10 +209,10 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 	newSquare = kingIdx
 	numPinnedPieces = 0
 	// generate rank ray upwards
-	for (ray&enemySlidingPieces == 0) && (newSquare-8) >= 0 && numPinnedPieces <= 1 {
+	for (ray&enemyRooksQueens == 0) && (newSquare-8) >= 0 && numPinnedPieces <= 1 {
 		newSquare -= 8
 		ray |= (1 << newSquare)
-		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+		if ray&enemyRooksQueens != 0 && numPinnedPieces == 1 {
 			rays[pinnedRayCount] = ray
 			pinnedRayCount++
 			break
@@ -227,10 +228,10 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 	newSquare = kingIdx
 	numPinnedPieces = 0
 	// generate rank ray down
-	for (ray&enemySlidingPieces == 0) && (newSquare+8) < 64 && numPinnedPieces <= 1 {
+	for (ray&enemyRooksQueens == 0) && (newSquare+8) < 64 && numPinnedPieces <= 1 {
 		newSquare += 8
 		ray |= (1 << newSquare)
-		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+		if ray&enemyRooksQueens != 0 && numPinnedPieces == 1 {
 			rays[pinnedRayCount] = ray
 			pinnedRayCount++
 			break
@@ -246,10 +247,10 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 	newSquare = kingIdx
 	numPinnedPieces = 0
 	// generate left diagonal down
-	for (ray&enemySlidingPieces == 0) && (newSquare+9) < 64 && numPinnedPieces <= 1 {
+	for (ray&enemyBishopsQueens == 0) && (newSquare+9) < 64 && numPinnedPieces <= 1 {
 		newSquare += 9
 		ray |= (1 << newSquare)
-		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+		if ray&enemyBishopsQueens != 0 && numPinnedPieces == 1 {
 			rays[pinnedRayCount] = ray
 			pinnedRayCount++
 			break
@@ -265,10 +266,10 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 	newSquare = kingIdx
 	numPinnedPieces = 0
 	// generate left diagonal up
-	for (ray&enemySlidingPieces == 0) && (newSquare-9) >= 0 && numPinnedPieces <= 1 {
+	for (ray&enemyBishopsQueens == 0) && (newSquare-9) >= 0 && numPinnedPieces <= 1 {
 		newSquare -= 9
 		ray |= (1 << newSquare)
-		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+		if ray&enemyBishopsQueens != 0 && numPinnedPieces == 1 {
 			rays[pinnedRayCount] = ray
 			pinnedRayCount++
 			break
@@ -284,10 +285,10 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 	newSquare = kingIdx
 	numPinnedPieces = 0
 	// generate right diagonal down
-	for (ray&enemySlidingPieces == 0) && (newSquare+7) < 64 && numPinnedPieces <= 1 {
+	for (ray&enemyBishopsQueens == 0) && (newSquare+7) < 64 && numPinnedPieces <= 1 {
 		newSquare += 7
 		ray |= (1 << newSquare)
-		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+		if ray&enemyBishopsQueens != 0 && numPinnedPieces == 1 {
 			rays[pinnedRayCount] = ray
 			pinnedRayCount++
 			break
@@ -303,10 +304,10 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 	newSquare = kingIdx
 	numPinnedPieces = 0
 	// generate left diagonal up
-	for (ray&enemySlidingPieces == 0) && (newSquare-7) >= 0 && numPinnedPieces <= 1 {
+	for (ray&enemyBishopsQueens == 0) && (newSquare-7) >= 0 && numPinnedPieces <= 1 {
 		newSquare -= 7
 		ray |= (1 << newSquare)
-		if ray&enemySlidingPieces != 0 && numPinnedPieces == 1 {
+		if ray&enemyBishopsQueens != 0 && numPinnedPieces == 1 {
 			rays[pinnedRayCount] = ray
 			pinnedRayCount++
 			break
@@ -365,13 +366,8 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 	DrawBitboard(captureMask)
 	DrawBitboard(pushMask)
 
-	blackQueenIdx := bits.TrailingZeros64(board.bitboards[BQ])
-	possibilities := board.HorizontalAndVerticalMoves(blackQueenIdx, board.stateBoards[Occupied])
-	possibilities |= board.DiagonalAndAntiDiagonalMoves(blackQueenIdx, board.stateBoards[Occupied])
-	DrawBitboard(possibilities)
-
 	board.possibleWhitePawn(moveList, pushMask, captureMask)
-	// board.possibleKnightMoves(moveList, board.bitboards[WN], WN)
+	board.possibleKnightMoves(moveList, board.bitboards[WN], WN, pushMask, captureMask)
 	// board.possibleBishopMoves(moveList, board.bitboards[WB], WB)
 	// board.possibleRookMoves(moveList, board.bitboards[WR], WR)
 	// board.possibleQueenMoves(moveList, board.bitboards[WQ], WQ)
@@ -612,3 +608,144 @@ func (board *Board) possibleBlackPawn(moveList *MoveList, pushMask, captureMask 
 		moveList.AddMove(GetMoveInt(index-1, index+8, BP, 0, MoveFlagEnPass))
 	}
 }
+
+func (board *Board) possibleKnightMoves(moveList *MoveList, knight uint64, pieceType int, pushMask, captureMask uint64) {
+	// Choose bishop
+	knightPossibility := knight & (^(knight - 1))
+	var possibility uint64
+
+	for knightPossibility != 0 {
+		// Current knight index (in bitmask)
+		knightIdx := bits.TrailingZeros64(knightPossibility)
+		possibility = KnightMoves[knightIdx] & board.stateBoards[NotMyPieces] & (pushMask | captureMask)
+		// choose move
+		movePossibility := possibility & (^(possibility - 1))
+		for movePossibility != 0 {
+			// possible move index (in bitmask)
+			moveIndex := bits.TrailingZeros64(movePossibility)
+			moveList.AddMove(GetMoveInt(knightIdx, moveIndex, pieceType, 0, NoFlag))
+			possibility &= ^movePossibility                      // remove move from all possible moves
+			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
+		}
+		knight &= ^knightPossibility
+		knightPossibility = knight & (^(knight - 1))
+	}
+}
+
+// func (board *Board) possibleBishopMoves(moveList *MoveList, bishop uint64, pieceType int) {
+// 	// Choose bishop
+// 	bishopPossibility := bishop & (^(bishop - 1))
+// 	var possibility uint64
+
+// 	for bishopPossibility != 0 {
+// 		// Current bishop index (in bitmask)
+// 		bishopIdx := bits.TrailingZeros64(bishopPossibility)
+// 		possibility = board.DiagonalAndAntiDiagonalMoves(bishopIdx) & NotMyPieces
+
+// 		// choose move
+// 		movePossibility := possibility & (^(possibility - 1))
+// 		for movePossibility != 0 {
+// 			// possible move index (in bitmask)
+// 			moveIndex := bits.TrailingZeros64(movePossibility)
+// 			moveList.AddMove(GetMoveInt(bishopIdx, moveIndex, pieceType, 0, NoFlag))
+// 			possibility &= ^movePossibility                      // remove move from all possible moves
+// 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
+// 		}
+// 		bishop &= ^bishopPossibility
+// 		bishopPossibility = bishop & (^(bishop - 1))
+// 	}
+// }
+
+// func (board *Board) possibleRookMoves(moveList *MoveList, rook uint64, pieceType int) {
+// 	// Choose rook
+// 	rookPossibility := rook & (^(rook - 1))
+// 	var possibility uint64
+
+// 	for rookPossibility != 0 {
+// 		// Current rook index (in bitmask)
+// 		rookIdx := bits.TrailingZeros64(rookPossibility)
+// 		possibility = board.HorizontalAndVerticalMoves(rookIdx) & NotMyPieces
+
+// 		// choose move
+// 		movePossibility := possibility & (^(possibility - 1))
+// 		for movePossibility != 0 {
+// 			// possible move index (in bitmask)
+// 			moveIndex := bits.TrailingZeros64(movePossibility)
+// 			moveList.AddMove(GetMoveInt(rookIdx, moveIndex, pieceType, 0, NoFlag))
+// 			possibility &= ^movePossibility                      // remove move from all possible moves
+// 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
+// 		}
+// 		rook &= ^rookPossibility
+// 		rookPossibility = rook & (^(rook - 1))
+// 	}
+// }
+
+// func (board *Board) possibleQueenMoves(moveList *MoveList, queen uint64, pieceType int) {
+// 	// Choose queen
+// 	queenPossibility := queen & (^(queen - 1))
+// 	var possibility uint64
+
+// 	for queenPossibility != 0 {
+// 		// Current queen index (in bitmask)
+// 		queenIdx := bits.TrailingZeros64(queenPossibility)
+// 		possibility = (board.HorizontalAndVerticalMoves(queenIdx) | board.DiagonalAndAntiDiagonalMoves(queenIdx)) & NotMyPieces
+
+// 		// choose move
+// 		movePossibility := possibility & (^(possibility - 1))
+// 		for movePossibility != 0 {
+// 			// possible move index (in bitmask)
+// 			moveIndex := bits.TrailingZeros64(movePossibility)
+// 			moveList.AddMove(GetMoveInt(queenIdx, moveIndex, pieceType, 0, NoFlag))
+// 			possibility &= ^movePossibility                      // remove move from all possible moves
+// 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
+// 		}
+// 		queen &= ^queenPossibility
+// 		queenPossibility = queen & (^(queen - 1))
+// 	}
+// }
+
+func (board *Board) possibleKingMoves(moveList *MoveList, king uint64, pieceType int) {
+	var possibility uint64
+
+	// Current king index (in bitmask)
+	kingIdx := bits.TrailingZeros64(king)
+
+	possibility = KingMoves[kingIdx] & board.stateBoards[NotMyPieces] & ^board.stateBoards[Unsafe]
+
+	// choose move
+	movePossibility := possibility & (^(possibility - 1))
+	for movePossibility != 0 {
+		// possible move index (in bitmask)
+		moveIndex := bits.TrailingZeros64(movePossibility)
+		moveList.AddMove(GetMoveInt(kingIdx, moveIndex, pieceType, 0, NoFlag))
+		possibility &= ^movePossibility                      // remove move from all possible moves
+		movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
+	}
+}
+
+// func (board *Board) possibleCastleWhite(moveList *MoveList) {
+// 	kingIdx := bits.TrailingZeros64(board.bitboards[WK])
+// 	var queenSideSqBitboard uint64 = 1<<(kingIdx-1) | 1<<(kingIdx-2)
+// 	var kingSideSqBitboard uint64 = 1<<(kingIdx+1) | 1<<(kingIdx+2)
+
+// 	// todo replace hardcoded squares with consts
+// 	if (board.castlePermissions&WhiteKingCastling) != 0 && (bits.OnesCount64((kingSideSqBitboard|board.bitboards[WK]) & ^Unsafe) == 3) && (bits.OnesCount64(Empty&kingSideSqBitboard) == 2) {
+// 		moveList.AddMove(GetMoveInt(60, 62, WK, 0, MoveFlagCastle))
+// 	}
+// 	if (board.castlePermissions&WhiteQueenCastling) != 0 && (bits.OnesCount64((queenSideSqBitboard|board.bitboards[WK]) & ^Unsafe) == 3) && (bits.OnesCount64(Empty&(queenSideSqBitboard|1<<(kingIdx-3))) == 3) { // on the queen side there are 3 sq that should be empty to enable castling
+// 		moveList.AddMove(GetMoveInt(60, 58, WK, 0, MoveFlagCastle))
+// 	}
+// }
+
+// func (board *Board) possibleCastleBlack(moveList *MoveList) {
+// 	kingIdx := bits.TrailingZeros64(board.bitboards[BK])
+// 	var queenSideSqBitboard uint64 = 1<<(kingIdx-1) | 1<<(kingIdx-2)
+// 	var kingSideSqBitboard uint64 = 1<<(kingIdx+1) | 1<<(kingIdx+2)
+
+// 	if (board.castlePermissions&BlackKingCastling) != 0 && (bits.OnesCount64((kingSideSqBitboard|board.bitboards[BK]) & ^Unsafe) == 3) && (bits.OnesCount64(Empty&kingSideSqBitboard) == 2) {
+// 		moveList.AddMove(GetMoveInt(4, 6, BK, 0, MoveFlagCastle))
+// 	}
+// 	if (board.castlePermissions&BlackQueenCastling) != 0 && (bits.OnesCount64((queenSideSqBitboard|board.bitboards[BK]) & ^Unsafe) == 3) && (bits.OnesCount64(Empty&(queenSideSqBitboard|1<<(kingIdx-3))) == 3) {
+// 		moveList.AddMove(GetMoveInt(4, 2, BK, 0, MoveFlagCastle))
+// 	}
+// }
