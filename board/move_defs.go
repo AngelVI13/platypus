@@ -193,6 +193,29 @@ func (moveList *MoveList) AddMove(move int) {
 	moveList.Count++
 }
 
+// PinRays Struct to hold all generated pin rays for a given position
+type PinRays struct {
+	Rays  [8]uint64 // an array with max possible pinned rays
+	Count int       // number of generated pin rays in the struct
+}
+
+// AddRay Adds ray to pin rays and updates count
+func (pinRays *PinRays) AddRay(ray uint64) {
+	pinRays.Rays[pinRays.Count] = ray
+	pinRays.Count++
+}
+
+// GetRay Get pin ray which corresponds to a given piece. If the given piece is not
+// pinned -> return ^0 i.e. the piece can move to any square and is not limmited by a pin ray
+func (pinRays *PinRays) GetRay(pieceBitboard uint64) uint64 {
+	for i := 0; i < pinRays.Count; i++ {
+		if pinRays.Rays[i]&pieceBitboard != 0 {
+			return pinRays.Rays[i]
+		}
+	}
+	return ^uint64(0)
+}
+
 // GetSquareString get algebraic notation of square i.e. b2, a6 from array index
 func GetSquareString(sq int) string {
 	file := sq % 8

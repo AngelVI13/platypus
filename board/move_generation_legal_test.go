@@ -8,7 +8,7 @@ import (
 func TestLegalMovesWhite(t *testing.T) {
 	InitHashKeys()
 	board := Board{}
-	board.ParseFen("8/4K3/8/6N1/4r3/8/8/3k4 w - - 0 1")
+	board.ParseFen("8/4K3/4N3/8/4r3/8/8/3k4 w - - 0 1")
 	// board.ParseFen("5kq1/2b5/8/4pP2/2K5/8/8/8 w - e6 0 1")
 	// board.ParseFen(StartingPosition)
 
@@ -27,9 +27,11 @@ func TestGetPinnedPieceRays(t *testing.T) {
 	board.ParseFen("r2q2q1/8/2RRR3/q1RKR2b/2RRR3/8/q1kq2q1/8 w - - 0 1")
 	board.UpdateBitMasks()
 
-	rays := board.getPinnedPieceRays(board.bitboards[WK])
-	for _, ray := range rays {
-		DrawBitboard(ray)
+	var pinRays PinRays
+
+	board.getPinnedPieceRays(board.bitboards[WK], &pinRays)
+	for i := 0; i < pinRays.Count; i++ {
+		DrawBitboard(pinRays.Rays[i])
 	}
 	t.Errorf("Error")
 }
@@ -66,7 +68,8 @@ func BenchmarkGetPinnedRays(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		board.getPinnedPieceRays(board.bitboards[WK])
+		var pinRays PinRays
+		board.getPinnedPieceRays(board.bitboards[WK], &pinRays)
 	}
 	b.StopTimer()
 }

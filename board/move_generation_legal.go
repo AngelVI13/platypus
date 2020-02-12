@@ -154,11 +154,9 @@ func getCheckerSliderRaysToKing(kingBitboard uint64, checkerBitboard uint64) uin
 
 // getPinnedPieceRays Get diagonal and horizontal rays that represent a pinned piece and its only available moves.
 // Ray does not include king
-func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
-	var rays [8]uint64
+func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 	var ray uint64
 	var numPinnedPieces int
-	var pinnedRayCount int
 
 	kingIdx := bits.TrailingZeros64(kingBitboard)
 	enemyRooksQueens := board.stateBoards[EnemyRooksQueens]
@@ -175,8 +173,7 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 		newSquare++
 		ray |= (1 << newSquare)
 		if ray&enemyRooksQueens != 0 && numPinnedPieces == 1 {
-			rays[pinnedRayCount] = ray
-			pinnedRayCount++
+			pinRays.AddRay(ray)
 			break
 		}
 
@@ -194,8 +191,7 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 		newSquare--
 		ray |= (1 << newSquare)
 		if ray&enemyRooksQueens != 0 && numPinnedPieces == 1 {
-			rays[pinnedRayCount] = ray
-			pinnedRayCount++
+			pinRays.AddRay(ray)
 			break
 		}
 
@@ -213,8 +209,7 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 		newSquare -= 8
 		ray |= (1 << newSquare)
 		if ray&enemyRooksQueens != 0 && numPinnedPieces == 1 {
-			rays[pinnedRayCount] = ray
-			pinnedRayCount++
+			pinRays.AddRay(ray)
 			break
 		}
 
@@ -232,8 +227,7 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 		newSquare += 8
 		ray |= (1 << newSquare)
 		if ray&enemyRooksQueens != 0 && numPinnedPieces == 1 {
-			rays[pinnedRayCount] = ray
-			pinnedRayCount++
+			pinRays.AddRay(ray)
 			break
 		}
 
@@ -251,8 +245,7 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 		newSquare += 9
 		ray |= (1 << newSquare)
 		if ray&enemyBishopsQueens != 0 && numPinnedPieces == 1 {
-			rays[pinnedRayCount] = ray
-			pinnedRayCount++
+			pinRays.AddRay(ray)
 			break
 		}
 
@@ -270,8 +263,7 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 		newSquare -= 9
 		ray |= (1 << newSquare)
 		if ray&enemyBishopsQueens != 0 && numPinnedPieces == 1 {
-			rays[pinnedRayCount] = ray
-			pinnedRayCount++
+			pinRays.AddRay(ray)
 			break
 		}
 
@@ -289,8 +281,7 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 		newSquare += 7
 		ray |= (1 << newSquare)
 		if ray&enemyBishopsQueens != 0 && numPinnedPieces == 1 {
-			rays[pinnedRayCount] = ray
-			pinnedRayCount++
+			pinRays.AddRay(ray)
 			break
 		}
 
@@ -308,8 +299,7 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 		newSquare -= 7
 		ray |= (1 << newSquare)
 		if ray&enemyBishopsQueens != 0 && numPinnedPieces == 1 {
-			rays[pinnedRayCount] = ray
-			pinnedRayCount++
+			pinRays.AddRay(ray)
 			break
 		}
 
@@ -318,8 +308,6 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64) [8]uint64 {
 			myPieces ^= ray & myPieces // remove identified piece from myPieces
 		}
 	}
-
-	return rays
 }
 
 // LegalMovesWhite Generates all legal moves for white
@@ -335,6 +323,7 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 	// By default those masks allow captures/moves on all squares
 	var captureMask uint64 = ^uint64(0)
 	var pushMask uint64 = ^uint64(0)
+	var pinRays PinRays
 
 	checkersNum := bits.OnesCount64(checkers)
 	if checkersNum > 1 {
@@ -365,9 +354,10 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 	DrawBitboard(checkers)
 	DrawBitboard(captureMask)
 	DrawBitboard(pushMask)
+	board.getPinnedPieceRays(board.bitboards[WK], &pinRays)
 
 	board.possibleWhitePawn(moveList, pushMask, captureMask)
-	board.possibleKnightMoves(moveList, board.bitboards[WN], WN, pushMask, captureMask)
+	board.possibleKnightMoves(moveList, board.bitboards[WN], WN, pushMask, captureMask, &pinRays)
 	// board.possibleBishopMoves(moveList, board.bitboards[WB], WB)
 	// board.possibleRookMoves(moveList, board.bitboards[WR], WR)
 	// board.possibleQueenMoves(moveList, board.bitboards[WQ], WQ)
@@ -609,7 +599,7 @@ func (board *Board) possibleBlackPawn(moveList *MoveList, pushMask, captureMask 
 	}
 }
 
-func (board *Board) possibleKnightMoves(moveList *MoveList, knight uint64, pieceType int, pushMask, captureMask uint64) {
+func (board *Board) possibleKnightMoves(moveList *MoveList, knight uint64, pieceType int, pushMask, captureMask uint64, pinRays *PinRays) {
 	// Choose bishop
 	knightPossibility := knight & (^(knight - 1))
 	var possibility uint64
@@ -617,7 +607,9 @@ func (board *Board) possibleKnightMoves(moveList *MoveList, knight uint64, piece
 	for knightPossibility != 0 {
 		// Current knight index (in bitmask)
 		knightIdx := bits.TrailingZeros64(knightPossibility)
-		possibility = KnightMoves[knightIdx] & board.stateBoards[NotMyPieces] & (pushMask | captureMask)
+		// if piece is pinned limits possibilities to move only along the pin line
+		pinRay := pinRays.GetRay(knightPossibility)
+		possibility = KnightMoves[knightIdx] & board.stateBoards[NotMyPieces] & (pushMask | captureMask) & pinRay
 		// choose move
 		movePossibility := possibility & (^(possibility - 1))
 		for movePossibility != 0 {
