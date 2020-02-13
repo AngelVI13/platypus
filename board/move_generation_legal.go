@@ -1,7 +1,6 @@
 package board
 
 import (
-	"fmt"
 	"math/bits"
 )
 
@@ -161,7 +160,8 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 	kingIdx := bits.TrailingZeros64(kingBitboard)
 	enemyRooksQueens := board.stateBoards[EnemyRooksQueens]
 	enemyBishopsQueens := board.stateBoards[EnemyBishopsQueens]
-	myPieces := board.stateBoards[MyPieces]
+	blockingPieces := board.stateBoards[MyPieces] | board.stateBoards[EnemyKnights]
+	DrawBitboard(blockingPieces)
 
 	ray = 0
 	newSquare := kingIdx
@@ -177,9 +177,9 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 			break
 		}
 
-		if ray&myPieces != 0 {
+		if ray&blockingPieces != 0 {
 			numPinnedPieces++
-			myPieces ^= ray & myPieces // remove identified piece from myPieces
+			blockingPieces ^= ray & blockingPieces // remove identified piece from myPieces
 		}
 	}
 
@@ -195,9 +195,9 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 			break
 		}
 
-		if ray&myPieces != 0 {
+		if ray&blockingPieces != 0 {
 			numPinnedPieces++
-			myPieces ^= ray & myPieces // remove identified piece from myPieces
+			blockingPieces ^= ray & blockingPieces // remove identified piece from myPieces
 		}
 	}
 
@@ -213,9 +213,9 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 			break
 		}
 
-		if ray&myPieces != 0 {
+		if ray&blockingPieces != 0 {
 			numPinnedPieces++
-			myPieces ^= ray & myPieces // remove identified piece from myPieces
+			blockingPieces ^= ray & blockingPieces // remove identified piece from myPieces
 		}
 	}
 
@@ -231,9 +231,9 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 			break
 		}
 
-		if ray&myPieces != 0 {
+		if ray&blockingPieces != 0 {
 			numPinnedPieces++
-			myPieces ^= ray & myPieces // remove identified piece from myPieces
+			blockingPieces ^= ray & blockingPieces // remove identified piece from myPieces
 		}
 	}
 
@@ -241,7 +241,8 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 	newSquare = kingIdx
 	numPinnedPieces = 0
 	// generate left diagonal down
-	for (ray&enemyBishopsQueens == 0) && (newSquare+9) < 64 && numPinnedPieces <= 1 {
+	// (newSquare%8+1 == (newSquare+9)%8) condition makes sure the diagonal does not wrap around
+	for (ray&enemyBishopsQueens == 0) && (newSquare+9) < 64 && (newSquare%8+1 == (newSquare+9)%8) && numPinnedPieces <= 1 {
 		newSquare += 9
 		ray |= (1 << newSquare)
 		if ray&enemyBishopsQueens != 0 && numPinnedPieces == 1 {
@@ -249,9 +250,9 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 			break
 		}
 
-		if ray&myPieces != 0 {
+		if ray&blockingPieces != 0 {
 			numPinnedPieces++
-			myPieces ^= ray & myPieces // remove identified piece from myPieces
+			blockingPieces ^= ray & blockingPieces // remove identified piece from myPieces
 		}
 	}
 
@@ -259,7 +260,7 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 	newSquare = kingIdx
 	numPinnedPieces = 0
 	// generate left diagonal up
-	for (ray&enemyBishopsQueens == 0) && (newSquare-9) >= 0 && numPinnedPieces <= 1 {
+	for (ray&enemyBishopsQueens == 0) && (newSquare-9) >= 0 && (newSquare%8-1 == (newSquare-9)%8) && numPinnedPieces <= 1 {
 		newSquare -= 9
 		ray |= (1 << newSquare)
 		if ray&enemyBishopsQueens != 0 && numPinnedPieces == 1 {
@@ -267,9 +268,9 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 			break
 		}
 
-		if ray&myPieces != 0 {
+		if ray&blockingPieces != 0 {
 			numPinnedPieces++
-			myPieces ^= ray & myPieces // remove identified piece from myPieces
+			blockingPieces ^= ray & blockingPieces // remove identified piece from myPieces
 		}
 	}
 
@@ -277,7 +278,7 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 	newSquare = kingIdx
 	numPinnedPieces = 0
 	// generate right diagonal down
-	for (ray&enemyBishopsQueens == 0) && (newSquare+7) < 64 && numPinnedPieces <= 1 {
+	for (ray&enemyBishopsQueens == 0) && (newSquare+7) < 64 && (newSquare%8-1 == (newSquare+7)%8) && numPinnedPieces <= 1 {
 		newSquare += 7
 		ray |= (1 << newSquare)
 		if ray&enemyBishopsQueens != 0 && numPinnedPieces == 1 {
@@ -285,9 +286,9 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 			break
 		}
 
-		if ray&myPieces != 0 {
+		if ray&blockingPieces != 0 {
 			numPinnedPieces++
-			myPieces ^= ray & myPieces // remove identified piece from myPieces
+			blockingPieces ^= ray & blockingPieces // remove identified piece from myPieces
 		}
 	}
 
@@ -295,7 +296,7 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 	newSquare = kingIdx
 	numPinnedPieces = 0
 	// generate left diagonal up
-	for (ray&enemyBishopsQueens == 0) && (newSquare-7) >= 0 && numPinnedPieces <= 1 {
+	for (ray&enemyBishopsQueens == 0) && (newSquare-7) >= 0 && (newSquare%8+1 == (newSquare-7)%8) && numPinnedPieces <= 1 {
 		newSquare -= 7
 		ray |= (1 << newSquare)
 		if ray&enemyBishopsQueens != 0 && numPinnedPieces == 1 {
@@ -303,9 +304,9 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 			break
 		}
 
-		if ray&myPieces != 0 {
+		if ray&blockingPieces != 0 {
 			numPinnedPieces++
-			myPieces ^= ray & myPieces // remove identified piece from myPieces
+			blockingPieces ^= ray & blockingPieces // remove identified piece from myPieces
 		}
 	}
 }
@@ -328,8 +329,8 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 	checkersNum := bits.OnesCount64(checkers)
 	if checkersNum > 1 {
 		// if there are more than 1 checking piece -> only king moves are possible
-		fmt.Println("More than 1 checkers")
-		DrawBitboard(checkers)
+		// fmt.Println("More than 1 checkers")
+		// DrawBitboard(checkers)
 		return
 	} else if checkersNum == 1 {
 		// if only 1 checker, we can evade check by capturing the checking piece
@@ -352,11 +353,14 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 		board.possibleCastleWhite(moveList)
 	}
 
-	fmt.Println("1 or 0 checkers")
-	DrawBitboard(checkers)
-	DrawBitboard(captureMask)
-	DrawBitboard(pushMask)
+	// fmt.Println("1 or 0 checkers")
+	// DrawBitboard(checkers)
+	// DrawBitboard(captureMask)
+	// DrawBitboard(pushMask)
 	board.getPinnedPieceRays(board.bitboards[WK], &pinRays)
+	for i := 0; i < pinRays.Count; i++ {
+		DrawBitboard(pinRays.Rays[i])
+	}
 
 	board.possibleWhitePawn(moveList, pushMask, captureMask, &pinRays)
 	board.possibleKnightMoves(moveList, board.bitboards[WN], WN, pushMask, captureMask, &pinRays)
@@ -383,8 +387,8 @@ func (board *Board) LegalMovesBlack(moveList *MoveList) {
 	checkersNum := bits.OnesCount64(checkers)
 	if checkersNum > 1 {
 		// if there are more than 1 checking piece -> only king moves are possible
-		fmt.Println("More than 1 checkers")
-		DrawBitboard(checkers)
+		// fmt.Println("More than 1 checkers")
+		// DrawBitboard(checkers)
 		return
 	} else if checkersNum == 1 {
 		// if only 1 checker, we can evade check by capturing the checking piece
@@ -407,11 +411,14 @@ func (board *Board) LegalMovesBlack(moveList *MoveList) {
 		board.possibleCastleBlack(moveList)
 	}
 
-	fmt.Println("1 or 0 checkers")
-	DrawBitboard(checkers)
-	DrawBitboard(captureMask)
-	DrawBitboard(pushMask)
+	// fmt.Println("1 or 0 checkers")
+	// DrawBitboard(checkers)
+	// DrawBitboard(captureMask)
+	// DrawBitboard(pushMask)
 	board.getPinnedPieceRays(board.bitboards[BK], &pinRays)
+	// for i := 0; i < pinRays.Count; i++ {
+	// 	DrawBitboard(pinRays.Rays[i])
+	// }
 
 	board.possibleBlackPawn(moveList, pushMask, captureMask, &pinRays)
 	board.possibleKnightMoves(moveList, board.bitboards[BN], BN, pushMask, captureMask, &pinRays)

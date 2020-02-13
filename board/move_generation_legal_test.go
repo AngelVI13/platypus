@@ -5,6 +5,82 @@ import (
 	"testing"
 )
 
+func TestGetMoves(t *testing.T) {
+	InitHashKeys()
+	board := Board{}
+	board.ParseFen("r6r/1b2k1bq/8/8/7B/8/8/R3K2R b QK - 3 2")
+	fmt.Println(&board)
+	moveList := board.GetMoves()
+	if moveList.Count != 8 {
+		PrintMoveList(&moveList)
+		t.Errorf("Expected 8 possible moves, got %d instead.", moveList.Count)
+	}
+
+	board.ParseFen("8/8/8/2k5/2pP4/8/B7/4K3 b - d3 5 3")
+	fmt.Println(&board)
+	moveList = board.GetMoves()
+	if moveList.Count != 8 {
+		PrintMoveList(&moveList)
+		t.Errorf("Expected 8 possible moves, got %d instead.", moveList.Count)
+	}
+
+	board.ParseFen("r1bqkbnr/pppppppp/n7/8/8/P7/1PPPPPPP/RNBQKBNR w QqKk - 2 2")
+	fmt.Println(&board)
+	moveList = board.GetMoves()
+	if moveList.Count != 19 {
+		PrintMoveList(&moveList)
+		t.Errorf("Expected 19 possible moves, got %d instead.", moveList.Count)
+	}
+
+	board.ParseFen("r3k2r/p1pp1pb1/bn2Qnp1/2qPN3/1p2P3/2N5/PPPBBPPP/R3K2R b QqKk - 3 2")
+	fmt.Println(&board)
+	moveList = board.GetMoves()
+	if moveList.Count != 5 {
+		PrintMoveList(&moveList)
+		t.Errorf("Expected 5 possible moves, got %d instead.", moveList.Count)
+	}
+
+	board.ParseFen("2kr3r/p1ppqpb1/bn2Qnp1/3PN3/1p2P3/2N5/PPPBBPPP/R3K2R b QK - 3 2")
+	fmt.Println(&board)
+	moveList = board.GetMoves()
+	if moveList.Count != 44 {
+		PrintMoveList(&moveList)
+		t.Errorf("Expected 44 possible moves, got %d instead.", moveList.Count)
+	}
+
+	board.ParseFen("rnb2k1r/pp1Pbppp/2p5/q7/2B5/8/PPPQNnPP/RNB1K2R w QK - 3 9")
+	fmt.Println(&board)
+	moveList = board.GetMoves()
+	if moveList.Count != 39 {
+		PrintMoveList(&moveList)
+		t.Errorf("Expected 39 possible moves, got %d instead.", moveList.Count)
+	}
+
+	board.ParseFen("2r5/3pk3/8/2P5/8/2K5/8/8 w - - 5 4")
+	fmt.Println(&board)
+	moveList = board.GetMoves()
+	if moveList.Count != 9 {
+		PrintMoveList(&moveList)
+		t.Errorf("Expected 9 possible moves, got %d instead.", moveList.Count)
+	}
+
+	board.ParseFen("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NKPP/RNBQ3R b - - 0 8")
+	fmt.Println(&board)
+	moveList = board.GetMoves()
+	if moveList.Count != 28 {
+		PrintMoveList(&moveList)
+		t.Errorf("Expected 28 possible moves, got %d instead.", moveList.Count)
+	}
+
+	board.ParseFen("rnbq1k1r/pp1Pbppp/2p5/8/2B5/3n4/PPPKN1PP/RNBQ3R w - - 3 9")
+	fmt.Println(&board)
+	moveList = board.GetMoves()
+	if moveList.Count != 37 {
+		PrintMoveList(&moveList)
+		t.Errorf("Expected 37 possible moves, got %d instead.", moveList.Count)
+	}
+}
+
 func TestLegalMovesWhite(t *testing.T) {
 	InitHashKeys()
 	board := Board{}

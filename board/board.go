@@ -320,3 +320,13 @@ func (board *Board) UpdateBitMasks() {
 		board.stateBoards[Unsafe] = board.unsafeForBlack()
 	}
 }
+
+// GetMoves Returns a struct that holds all the possible moves for a given position
+func (board *Board) GetMoves() (moveList MoveList) {
+	if board.Side == White {
+		board.LegalMovesWhite(&moveList)
+	} else {
+		board.LegalMovesBlack(&moveList)
+	}
+	return moveList
+}
