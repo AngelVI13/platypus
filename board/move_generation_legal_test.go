@@ -79,6 +79,14 @@ func TestGetMoves(t *testing.T) {
 		PrintMoveList(&moveList)
 		t.Errorf("Expected 37 possible moves, got %d instead.", moveList.Count)
 	}
+
+	board.ParseFen("rnbq1k1r/pp1P1ppp/2pb4/8/2B5/8/PPPKNnPP/RNBQ3R w - - 3 9")
+	fmt.Println(&board)
+	moveList = board.GetMoves()
+	if moveList.Count != 36 {
+		PrintMoveList(&moveList)
+		t.Errorf("Expected 36 possible moves, got %d instead.", moveList.Count)
+	}
 }
 
 func TestLegalMovesWhite(t *testing.T) {

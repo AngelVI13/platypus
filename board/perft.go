@@ -1,7 +1,5 @@
 package board
 
-import "fmt"
-
 var PerftMoveCounter int
 var PerftMaxDepth int
 var PerftCaptures int
@@ -22,20 +20,20 @@ func Perft(board Board, depth int) {
 			moveBoard.MakeMove(move)
 			// fmt.Println(&moveBoard)
 
-			var currentMoveCount int
-			if depth == 0 {
-				currentMoveCount = PerftMoveCounter
-			}
+			// var currentMoveCount int
+			// if depth == 0 {
+			// 	currentMoveCount = PerftMoveCounter
+			// }
 
 			if (depth + 1) == PerftMaxDepth {
 				PerftMoveCounter++
 			}
 			Perft(moveBoard, depth+1)
 
-			if depth == 0 {
-				currentMoveCount = PerftMoveCounter - currentMoveCount
-				fmt.Printf("%s: %d\n", GetMoveString(move), currentMoveCount)
-			}
+			// if depth == 0 {
+			// 	currentMoveCount = PerftMoveCounter - currentMoveCount
+			// 	fmt.Printf("%s: %d\n", GetMoveString(move), currentMoveCount)
+			// }
 		}
 	}
 }

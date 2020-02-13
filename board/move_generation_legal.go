@@ -161,11 +161,15 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 	enemyRooksQueens := board.stateBoards[EnemyRooksQueens]
 	enemyBishopsQueens := board.stateBoards[EnemyBishopsQueens]
 	blockingPieces := board.stateBoards[MyPieces] | board.stateBoards[EnemyKnights]
-	DrawBitboard(blockingPieces)
+	enemySide := board.Side ^ 1
+	enemyBishops := board.bitboards[enemySide*6+WB]
+	enemyRooks := board.bitboards[enemySide*6+WR]
 
 	ray = 0
 	newSquare := kingIdx
 	numPinnedPieces = 0
+	// when calculating horizontal & vertical pins - enemy bishops are blocking pieces
+	blockingPieces ^= enemyBishops
 	// generate file ray to the right
 	// if there are more than 1 piece between my king and an enemy slider
 	// -> not a pinned piece
@@ -240,6 +244,9 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 	ray = 0
 	newSquare = kingIdx
 	numPinnedPieces = 0
+	// when calculating diagonal & antidiagonal pins - enemy rooks are blocking pieces, bishops are not
+	blockingPieces ^= enemyBishops // remove enemy bishops
+	blockingPieces ^= enemyRooks   // add enemy rooks
 	// generate left diagonal down
 	// (newSquare%8+1 == (newSquare+9)%8) condition makes sure the diagonal does not wrap around
 	for (ray&enemyBishopsQueens == 0) && (newSquare+9) < 64 && (newSquare%8+1 == (newSquare+9)%8) && numPinnedPieces <= 1 {
@@ -358,9 +365,9 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 	// DrawBitboard(captureMask)
 	// DrawBitboard(pushMask)
 	board.getPinnedPieceRays(board.bitboards[WK], &pinRays)
-	for i := 0; i < pinRays.Count; i++ {
-		DrawBitboard(pinRays.Rays[i])
-	}
+	// for i := 0; i < pinRays.Count; i++ {
+	// 	DrawBitboard(pinRays.Rays[i])
+	// }
 
 	board.possibleWhitePawn(moveList, pushMask, captureMask, &pinRays)
 	board.possibleKnightMoves(moveList, board.bitboards[WN], WN, pushMask, captureMask, &pinRays)
