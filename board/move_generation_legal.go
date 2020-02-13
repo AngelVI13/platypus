@@ -358,10 +358,9 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 
 	board.possibleWhitePawn(moveList, pushMask, captureMask, &pinRays)
 	board.possibleKnightMoves(moveList, board.bitboards[WN], WN, pushMask, captureMask, &pinRays)
-	// board.possibleBishopMoves(moveList, board.bitboards[WB], WB)
-	// board.possibleRookMoves(moveList, board.bitboards[WR], WR)
-	// board.possibleQueenMoves(moveList, board.bitboards[WQ], WQ)
-	// board.possibleKingMoves(moveList, board.bitboards[WK], WK)
+	board.possibleBishopMoves(moveList, board.bitboards[WB], WB, pushMask, captureMask, &pinRays)
+	board.possibleRookMoves(moveList, board.bitboards[WR], WR, pushMask, captureMask, &pinRays)
+	board.possibleQueenMoves(moveList, board.bitboards[WQ], WQ, pushMask, captureMask, &pinRays)
 	// board.possibleCastleWhite(moveList)
 }
 
@@ -413,10 +412,9 @@ func (board *Board) LegalMovesBlack(moveList *MoveList) {
 
 	board.possibleBlackPawn(moveList, pushMask, captureMask, &pinRays)
 	board.possibleKnightMoves(moveList, board.bitboards[BN], BN, pushMask, captureMask, &pinRays)
-	// board.possibleBishopMoves(moveList, board.bitboards[WB], WB)
-	// board.possibleRookMoves(moveList, board.bitboards[WR], WR)
-	// board.possibleQueenMoves(moveList, board.bitboards[WQ], WQ)
-	// board.possibleKingMoves(moveList, board.bitboards[WK], WK)
+	board.possibleBishopMoves(moveList, board.bitboards[BB], BB, pushMask, captureMask, &pinRays)
+	board.possibleRookMoves(moveList, board.bitboards[BR], BR, pushMask, captureMask, &pinRays)
+	board.possibleQueenMoves(moveList, board.bitboards[BQ], BQ, pushMask, captureMask, &pinRays)
 	// board.possibleCastleWhite(moveList)
 }
 
@@ -765,77 +763,84 @@ func (board *Board) possibleKnightMoves(moveList *MoveList, knight uint64, piece
 	}
 }
 
-// func (board *Board) possibleBishopMoves(moveList *MoveList, bishop uint64, pieceType int) {
-// 	// Choose bishop
-// 	bishopPossibility := bishop & (^(bishop - 1))
-// 	var possibility uint64
+func (board *Board) possibleBishopMoves(moveList *MoveList, bishop uint64, pieceType int, pushMask, captureMask uint64, pinRays *PinRays) {
+	// Choose bishop
+	bishopPossibility := bishop & (^(bishop - 1))
+	var possibility uint64
 
-// 	for bishopPossibility != 0 {
-// 		// Current bishop index (in bitmask)
-// 		bishopIdx := bits.TrailingZeros64(bishopPossibility)
-// 		possibility = board.DiagonalAndAntiDiagonalMoves(bishopIdx) & NotMyPieces
+	for bishopPossibility != 0 {
+		// Current bishop index (in bitmask)
+		bishopIdx := bits.TrailingZeros64(bishopPossibility)
+		pinRay := pinRays.GetRay(bishopPossibility)
+		possibility = board.DiagonalAndAntiDiagonalMoves(bishopIdx, board.stateBoards[Occupied])
+		possibility &= board.stateBoards[NotMyPieces] & (pushMask | captureMask) & pinRay
 
-// 		// choose move
-// 		movePossibility := possibility & (^(possibility - 1))
-// 		for movePossibility != 0 {
-// 			// possible move index (in bitmask)
-// 			moveIndex := bits.TrailingZeros64(movePossibility)
-// 			moveList.AddMove(GetMoveInt(bishopIdx, moveIndex, pieceType, 0, NoFlag))
-// 			possibility &= ^movePossibility                      // remove move from all possible moves
-// 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
-// 		}
-// 		bishop &= ^bishopPossibility
-// 		bishopPossibility = bishop & (^(bishop - 1))
-// 	}
-// }
+		// choose move
+		movePossibility := possibility & (^(possibility - 1))
+		for movePossibility != 0 {
+			// possible move index (in bitmask)
+			moveIndex := bits.TrailingZeros64(movePossibility)
+			moveList.AddMove(GetMoveInt(bishopIdx, moveIndex, pieceType, 0, NoFlag))
+			possibility &= ^movePossibility                      // remove move from all possible moves
+			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
+		}
+		bishop &= ^bishopPossibility
+		bishopPossibility = bishop & (^(bishop - 1))
+	}
+}
 
-// func (board *Board) possibleRookMoves(moveList *MoveList, rook uint64, pieceType int) {
-// 	// Choose rook
-// 	rookPossibility := rook & (^(rook - 1))
-// 	var possibility uint64
+func (board *Board) possibleRookMoves(moveList *MoveList, rook uint64, pieceType int, pushMask, captureMask uint64, pinRays *PinRays) {
+	// Choose rook
+	rookPossibility := rook & (^(rook - 1))
+	var possibility uint64
 
-// 	for rookPossibility != 0 {
-// 		// Current rook index (in bitmask)
-// 		rookIdx := bits.TrailingZeros64(rookPossibility)
-// 		possibility = board.HorizontalAndVerticalMoves(rookIdx) & NotMyPieces
+	for rookPossibility != 0 {
+		// Current rook index (in bitmask)
+		rookIdx := bits.TrailingZeros64(rookPossibility)
+		possibility = board.HorizontalAndVerticalMoves(rookIdx, board.stateBoards[Occupied])
+		pinRay := pinRays.GetRay(rookPossibility)
+		possibility &= board.stateBoards[NotMyPieces] & (pushMask | captureMask) & pinRay
 
-// 		// choose move
-// 		movePossibility := possibility & (^(possibility - 1))
-// 		for movePossibility != 0 {
-// 			// possible move index (in bitmask)
-// 			moveIndex := bits.TrailingZeros64(movePossibility)
-// 			moveList.AddMove(GetMoveInt(rookIdx, moveIndex, pieceType, 0, NoFlag))
-// 			possibility &= ^movePossibility                      // remove move from all possible moves
-// 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
-// 		}
-// 		rook &= ^rookPossibility
-// 		rookPossibility = rook & (^(rook - 1))
-// 	}
-// }
+		// choose move
+		movePossibility := possibility & (^(possibility - 1))
+		for movePossibility != 0 {
+			// possible move index (in bitmask)
+			moveIndex := bits.TrailingZeros64(movePossibility)
+			moveList.AddMove(GetMoveInt(rookIdx, moveIndex, pieceType, 0, NoFlag))
+			possibility &= ^movePossibility                      // remove move from all possible moves
+			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
+		}
+		rook &= ^rookPossibility
+		rookPossibility = rook & (^(rook - 1))
+	}
+}
 
-// func (board *Board) possibleQueenMoves(moveList *MoveList, queen uint64, pieceType int) {
-// 	// Choose queen
-// 	queenPossibility := queen & (^(queen - 1))
-// 	var possibility uint64
+func (board *Board) possibleQueenMoves(moveList *MoveList, queen uint64, pieceType int, pushMask, captureMask uint64, pinRays *PinRays) {
+	// Choose queen
+	queenPossibility := queen & (^(queen - 1))
+	var possibility uint64
 
-// 	for queenPossibility != 0 {
-// 		// Current queen index (in bitmask)
-// 		queenIdx := bits.TrailingZeros64(queenPossibility)
-// 		possibility = (board.HorizontalAndVerticalMoves(queenIdx) | board.DiagonalAndAntiDiagonalMoves(queenIdx)) & NotMyPieces
+	for queenPossibility != 0 {
+		// Current queen index (in bitmask)
+		queenIdx := bits.TrailingZeros64(queenPossibility)
+		pinRay := pinRays.GetRay(queenPossibility)
+		possibility = board.HorizontalAndVerticalMoves(queenIdx, board.stateBoards[Occupied])
+		possibility |= board.DiagonalAndAntiDiagonalMoves(queenIdx, board.stateBoards[Occupied])
+		possibility &= board.stateBoards[NotMyPieces] & (pushMask | captureMask) & pinRay
 
-// 		// choose move
-// 		movePossibility := possibility & (^(possibility - 1))
-// 		for movePossibility != 0 {
-// 			// possible move index (in bitmask)
-// 			moveIndex := bits.TrailingZeros64(movePossibility)
-// 			moveList.AddMove(GetMoveInt(queenIdx, moveIndex, pieceType, 0, NoFlag))
-// 			possibility &= ^movePossibility                      // remove move from all possible moves
-// 			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
-// 		}
-// 		queen &= ^queenPossibility
-// 		queenPossibility = queen & (^(queen - 1))
-// 	}
-// }
+		// choose move
+		movePossibility := possibility & (^(possibility - 1))
+		for movePossibility != 0 {
+			// possible move index (in bitmask)
+			moveIndex := bits.TrailingZeros64(movePossibility)
+			moveList.AddMove(GetMoveInt(queenIdx, moveIndex, pieceType, 0, NoFlag))
+			possibility &= ^movePossibility                      // remove move from all possible moves
+			movePossibility = possibility & (^(possibility - 1)) // calculate new possible move
+		}
+		queen &= ^queenPossibility
+		queenPossibility = queen & (^(queen - 1))
+	}
+}
 
 func (board *Board) possibleKingMoves(moveList *MoveList, king uint64, pieceType int) {
 	var possibility uint64
