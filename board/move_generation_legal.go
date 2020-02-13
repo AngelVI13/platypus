@@ -397,7 +397,11 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index+7, index, WP, 0, NoFlag))
+		ray := pinRays.GetRay(1 << (index + 7))
+		if possibility&ray != 0 {
+			// add move only if the pawn is not pinned
+			moveList.AddMove(GetMoveInt(index+7, index, WP, 0, NoFlag))
+		}
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -407,7 +411,10 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index+9, index, WP, 0, NoFlag))
+		ray := pinRays.GetRay(1 << (index + 9))
+		if possibility&ray != 0 {
+			moveList.AddMove(GetMoveInt(index+9, index, WP, 0, NoFlag))
+		}
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -417,7 +424,10 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index+8, index, WP, 0, NoFlag))
+		ray := pinRays.GetRay(1 << (index + 8))
+		if possibility&ray != 0 {
+			moveList.AddMove(GetMoveInt(index+8, index, WP, 0, NoFlag))
+		}
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -429,7 +439,10 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index+16, index, WP, 0, MoveFlagPawnStart))
+		ray := pinRays.GetRay(1 << (index + 16))
+		if possibility&ray != 0 {
+			moveList.AddMove(GetMoveInt(index+16, index, WP, 0, MoveFlagPawnStart))
+		}
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -440,11 +453,14 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		// todo maybe Capture flag??
-		moveList.AddMove(GetMoveInt(index+7, index, WP, WQ, NoFlag))
-		moveList.AddMove(GetMoveInt(index+7, index, WP, WR, NoFlag))
-		moveList.AddMove(GetMoveInt(index+7, index, WP, WB, NoFlag))
-		moveList.AddMove(GetMoveInt(index+7, index, WP, WN, NoFlag))
+		ray := pinRays.GetRay(1 << (index + 7))
+		if possibility&ray != 0 {
+			// todo maybe Capture flag??
+			moveList.AddMove(GetMoveInt(index+7, index, WP, WQ, NoFlag))
+			moveList.AddMove(GetMoveInt(index+7, index, WP, WR, NoFlag))
+			moveList.AddMove(GetMoveInt(index+7, index, WP, WB, NoFlag))
+			moveList.AddMove(GetMoveInt(index+7, index, WP, WN, NoFlag))
+		}
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -454,11 +470,14 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		// todo maybe Capture flag??
-		moveList.AddMove(GetMoveInt(index+9, index, WP, WQ, NoFlag))
-		moveList.AddMove(GetMoveInt(index+9, index, WP, WR, NoFlag))
-		moveList.AddMove(GetMoveInt(index+9, index, WP, WB, NoFlag))
-		moveList.AddMove(GetMoveInt(index+9, index, WP, WN, NoFlag))
+		ray := pinRays.GetRay(1 << (index + 9))
+		if possibility&ray != 0 {
+			// todo maybe Capture flag??
+			moveList.AddMove(GetMoveInt(index+9, index, WP, WQ, NoFlag))
+			moveList.AddMove(GetMoveInt(index+9, index, WP, WR, NoFlag))
+			moveList.AddMove(GetMoveInt(index+9, index, WP, WB, NoFlag))
+			moveList.AddMove(GetMoveInt(index+9, index, WP, WN, NoFlag))
+		}
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -468,10 +487,13 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	possibility = pawnMoves & (^(pawnMoves - 1))
 	for possibility != 0 {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index+8, index, WP, WQ, NoFlag))
-		moveList.AddMove(GetMoveInt(index+8, index, WP, WR, NoFlag))
-		moveList.AddMove(GetMoveInt(index+8, index, WP, WB, NoFlag))
-		moveList.AddMove(GetMoveInt(index+8, index, WP, WN, NoFlag))
+		ray := pinRays.GetRay(1 << (index + 8))
+		if possibility&ray != 0 {
+			moveList.AddMove(GetMoveInt(index+8, index, WP, WQ, NoFlag))
+			moveList.AddMove(GetMoveInt(index+8, index, WP, WR, NoFlag))
+			moveList.AddMove(GetMoveInt(index+8, index, WP, WB, NoFlag))
+			moveList.AddMove(GetMoveInt(index+8, index, WP, WN, NoFlag))
+		}
 		pawnMoves &= ^possibility                    // remove the capture that we just analyzed
 		possibility = pawnMoves & (^(pawnMoves - 1)) // find next bit equal to '1' i.e. next capture
 	}
@@ -482,14 +504,34 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 	// or the destination to where out pawn will move during the capture is in the push mask
 	if possibility != 0 && ((possibility&captureMask) != 0 || (possibility>>8&pushMask) != 0) {
 		index = bits.TrailingZeros64(possibility)
-		moveList.AddMove(GetMoveInt(index-1, index-8, WP, 0, MoveFlagEnPass))
+
+		// Remove the capturing and captured pawn from the board and check
+		// if the king is attacked by a rook or queen i.e this en passant capture is
+		// illegal: example - 8/8/8/K2pP2q/8/8/8/3k4 w - d6 0 2
+		occupied := board.stateBoards[Occupied]
+		occupied ^= (1 << (index - 1)) | (1 << index)
+		kingIdx := bits.TrailingZeros64(board.bitboards[WK])
+		horizontalMoves := board.HorizontalAndVerticalMoves(kingIdx, occupied)
+		checkers := horizontalMoves & board.stateBoards[EnemyRooksQueens]
+
+		if checkers == 0 {
+			moveList.AddMove(GetMoveInt(index-1, index-8, WP, 0, MoveFlagEnPass))
+		}
 	}
 	// en passant left
 	possibility = (wp >> 1) & board.bitboards[BP] & Rank5 & (^FileH) & board.bitboards[EP]
 	if possibility != 0 && ((possibility&captureMask) != 0 || (possibility>>8&pushMask) != 0) {
 		index = bits.TrailingZeros64(possibility)
-		fmt.Println(index)
-		moveList.AddMove(GetMoveInt(index+1, index-8, WP, 0, MoveFlagEnPass))
+
+		occupied := board.stateBoards[Occupied]
+		occupied ^= (1 << (index + 1)) | (1 << index)
+		kingIdx := bits.TrailingZeros64(board.bitboards[WK])
+		horizontalMoves := board.HorizontalAndVerticalMoves(kingIdx, occupied)
+		checkers := horizontalMoves & board.stateBoards[EnemyRooksQueens]
+
+		if checkers == 0 {
+			moveList.AddMove(GetMoveInt(index+1, index-8, WP, 0, MoveFlagEnPass))
+		}
 	}
 }
 
