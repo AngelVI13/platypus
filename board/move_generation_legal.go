@@ -348,6 +348,8 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 		if pushMask == ^uint64(0) {
 			pushMask = 0
 		}
+	} else {
+		board.possibleCastleWhite(moveList)
 	}
 
 	fmt.Println("1 or 0 checkers")
@@ -361,7 +363,6 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 	board.possibleBishopMoves(moveList, board.bitboards[WB], WB, pushMask, captureMask, &pinRays)
 	board.possibleRookMoves(moveList, board.bitboards[WR], WR, pushMask, captureMask, &pinRays)
 	board.possibleQueenMoves(moveList, board.bitboards[WQ], WQ, pushMask, captureMask, &pinRays)
-	// board.possibleCastleWhite(moveList)
 }
 
 // LegalMovesBlack Generates all legal moves for black
@@ -402,6 +403,8 @@ func (board *Board) LegalMovesBlack(moveList *MoveList) {
 		if pushMask == ^uint64(0) {
 			pushMask = 0
 		}
+	} else {
+		board.possibleCastleBlack(moveList)
 	}
 
 	fmt.Println("1 or 0 checkers")
@@ -415,7 +418,6 @@ func (board *Board) LegalMovesBlack(moveList *MoveList) {
 	board.possibleBishopMoves(moveList, board.bitboards[BB], BB, pushMask, captureMask, &pinRays)
 	board.possibleRookMoves(moveList, board.bitboards[BR], BR, pushMask, captureMask, &pinRays)
 	board.possibleQueenMoves(moveList, board.bitboards[BQ], BQ, pushMask, captureMask, &pinRays)
-	// board.possibleCastleWhite(moveList)
 }
 
 func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask uint64, pinRays *PinRays) {
@@ -861,29 +863,35 @@ func (board *Board) possibleKingMoves(moveList *MoveList, king uint64, pieceType
 	}
 }
 
-// func (board *Board) possibleCastleWhite(moveList *MoveList) {
-// 	kingIdx := bits.TrailingZeros64(board.bitboards[WK])
-// 	var queenSideSqBitboard uint64 = 1<<(kingIdx-1) | 1<<(kingIdx-2)
-// 	var kingSideSqBitboard uint64 = 1<<(kingIdx+1) | 1<<(kingIdx+2)
+func (board *Board) possibleCastleWhite(moveList *MoveList) {
+	empty := board.stateBoards[Empty]
+	unsafe := board.stateBoards[Unsafe]
 
-// 	// todo replace hardcoded squares with consts
-// 	if (board.castlePermissions&WhiteKingCastling) != 0 && (bits.OnesCount64((kingSideSqBitboard|board.bitboards[WK]) & ^Unsafe) == 3) && (bits.OnesCount64(Empty&kingSideSqBitboard) == 2) {
-// 		moveList.AddMove(GetMoveInt(60, 62, WK, 0, MoveFlagCastle))
-// 	}
-// 	if (board.castlePermissions&WhiteQueenCastling) != 0 && (bits.OnesCount64((queenSideSqBitboard|board.bitboards[WK]) & ^Unsafe) == 3) && (bits.OnesCount64(Empty&(queenSideSqBitboard|1<<(kingIdx-3))) == 3) { // on the queen side there are 3 sq that should be empty to enable castling
-// 		moveList.AddMove(GetMoveInt(60, 58, WK, 0, MoveFlagCastle))
-// 	}
-// }
+	kingIdx := bits.TrailingZeros64(board.bitboards[WK])
+	var queenSideSqBitboard uint64 = 1<<(kingIdx-1) | 1<<(kingIdx-2)
+	var kingSideSqBitboard uint64 = 1<<(kingIdx+1) | 1<<(kingIdx+2)
 
-// func (board *Board) possibleCastleBlack(moveList *MoveList) {
-// 	kingIdx := bits.TrailingZeros64(board.bitboards[BK])
-// 	var queenSideSqBitboard uint64 = 1<<(kingIdx-1) | 1<<(kingIdx-2)
-// 	var kingSideSqBitboard uint64 = 1<<(kingIdx+1) | 1<<(kingIdx+2)
+	// todo replace hardcoded squares with consts
+	if (board.castlePermissions&WhiteKingCastling) != 0 && (bits.OnesCount64((kingSideSqBitboard|board.bitboards[WK]) & ^unsafe) == 3) && (bits.OnesCount64(empty&kingSideSqBitboard) == 2) {
+		moveList.AddMove(GetMoveInt(60, 62, WK, 0, MoveFlagCastle))
+	}
+	if (board.castlePermissions&WhiteQueenCastling) != 0 && (bits.OnesCount64((queenSideSqBitboard|board.bitboards[WK]) & ^unsafe) == 3) && (bits.OnesCount64(empty&(queenSideSqBitboard|1<<(kingIdx-3))) == 3) { // on the queen side there are 3 sq that should be empty to enable castling
+		moveList.AddMove(GetMoveInt(60, 58, WK, 0, MoveFlagCastle))
+	}
+}
 
-// 	if (board.castlePermissions&BlackKingCastling) != 0 && (bits.OnesCount64((kingSideSqBitboard|board.bitboards[BK]) & ^Unsafe) == 3) && (bits.OnesCount64(Empty&kingSideSqBitboard) == 2) {
-// 		moveList.AddMove(GetMoveInt(4, 6, BK, 0, MoveFlagCastle))
-// 	}
-// 	if (board.castlePermissions&BlackQueenCastling) != 0 && (bits.OnesCount64((queenSideSqBitboard|board.bitboards[BK]) & ^Unsafe) == 3) && (bits.OnesCount64(Empty&(queenSideSqBitboard|1<<(kingIdx-3))) == 3) {
-// 		moveList.AddMove(GetMoveInt(4, 2, BK, 0, MoveFlagCastle))
-// 	}
-// }
+func (board *Board) possibleCastleBlack(moveList *MoveList) {
+	empty := board.stateBoards[Empty]
+	unsafe := board.stateBoards[Unsafe]
+
+	kingIdx := bits.TrailingZeros64(board.bitboards[BK])
+	var queenSideSqBitboard uint64 = 1<<(kingIdx-1) | 1<<(kingIdx-2)
+	var kingSideSqBitboard uint64 = 1<<(kingIdx+1) | 1<<(kingIdx+2)
+
+	if (board.castlePermissions&BlackKingCastling) != 0 && (bits.OnesCount64((kingSideSqBitboard|board.bitboards[BK]) & ^unsafe) == 3) && (bits.OnesCount64(empty&kingSideSqBitboard) == 2) {
+		moveList.AddMove(GetMoveInt(4, 6, BK, 0, MoveFlagCastle))
+	}
+	if (board.castlePermissions&BlackQueenCastling) != 0 && (bits.OnesCount64((queenSideSqBitboard|board.bitboards[BK]) & ^unsafe) == 3) && (bits.OnesCount64(empty&(queenSideSqBitboard|1<<(kingIdx-3))) == 3) {
+		moveList.AddMove(GetMoveInt(4, 2, BK, 0, MoveFlagCastle))
+	}
+}
