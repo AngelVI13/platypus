@@ -162,7 +162,7 @@ func (board *Board) getPinnedPieceRays(kingBitboard uint64, pinRays *PinRays) {
 	enemyBishopsQueens := board.stateBoards[EnemyBishopsQueens]
 	enemySide := board.Side ^ 1
 	// enemy knights and pawns are always pin blocking pieces
-	blockingPieces := board.stateBoards[MyPieces] | board.stateBoards[EnemyKnights] | board.bitboards[enemySide*6+WP]
+	blockingPieces := board.stateBoards[MyPieces] | board.stateBoards[EnemyKnights] | board.bitboards[EnemyPawns]
 	enemyBishops := board.bitboards[enemySide*6+WB]
 	enemyRooks := board.bitboards[enemySide*6+WR]
 
