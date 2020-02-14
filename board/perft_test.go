@@ -47,7 +47,7 @@ func TestPerftPosition2(t *testing.T) {
 	}
 }
 
-func BenchmarkPerftStartingPositionDepth5(b *testing.B) {
+func BenchmarkPerftStartingPositionDepth3(b *testing.B) {
 	board := Board{}
 	board.ParseFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 
