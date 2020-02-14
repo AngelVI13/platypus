@@ -23,9 +23,11 @@ jobs:
 #             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 #             dep ensure
 #         fi
+    - name: Set environmental variables
+      run: export $GOPATH=$GOPATH:$(pwd)
 
     - name: Build
-      run: pwd && go build -v .
+      run: go build -v .
   
     - name: Test
       run: go test ./board
