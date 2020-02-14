@@ -24,7 +24,7 @@ jobs:
 #             dep ensure
 #         fi
     - name: Set environmental variables
-      run: export $GOPATH=$GOPATH:$(pwd)
+      run: export GOPATH=${GOPATH}:$(pwd)
 
     - name: Build
       run: go build -v .
