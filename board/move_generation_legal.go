@@ -361,14 +361,7 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 		board.possibleCastleWhite(moveList)
 	}
 
-	// fmt.Println("1 or 0 checkers")
-	// DrawBitboard(checkers)
-	// DrawBitboard(captureMask)
-	// DrawBitboard(pushMask)
 	board.getPinnedPieceRays(board.bitboards[WK], &pinRays)
-	// for i := 0; i < pinRays.Count; i++ {
-	// 	DrawBitboard(pinRays.Rays[i])
-	// }
 
 	board.possibleWhitePawn(moveList, pushMask, captureMask, &pinRays)
 	board.possibleKnightMoves(moveList, board.bitboards[WN], WN, pushMask, captureMask, &pinRays)
@@ -395,8 +388,6 @@ func (board *Board) LegalMovesBlack(moveList *MoveList) {
 	checkersNum := bits.OnesCount64(checkers)
 	if checkersNum > 1 {
 		// if there are more than 1 checking piece -> only king moves are possible
-		// fmt.Println("More than 1 checkers")
-		// DrawBitboard(checkers)
 		return
 	} else if checkersNum == 1 {
 		// if only 1 checker, we can evade check by capturing the checking piece
@@ -419,14 +410,7 @@ func (board *Board) LegalMovesBlack(moveList *MoveList) {
 		board.possibleCastleBlack(moveList)
 	}
 
-	// fmt.Println("1 or 0 checkers")
-	// DrawBitboard(checkers)
-	// DrawBitboard(captureMask)
-	// DrawBitboard(pushMask)
 	board.getPinnedPieceRays(board.bitboards[BK], &pinRays)
-	// for i := 0; i < pinRays.Count; i++ {
-	// 	DrawBitboard(pinRays.Rays[i])
-	// }
 
 	board.possibleBlackPawn(moveList, pushMask, captureMask, &pinRays)
 	board.possibleKnightMoves(moveList, board.bitboards[BN], BN, pushMask, captureMask, &pinRays)

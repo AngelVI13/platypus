@@ -100,7 +100,7 @@ func TestLegalMovesWhite(t *testing.T) {
 	PrintMoveList(&moveList)
 
 	// fmt.Println(len(moveList) / 4)
-	t.Errorf("Error")
+	// t.Errorf("Error")
 }
 
 func TestLegalMovesBlack(t *testing.T) {
@@ -117,7 +117,7 @@ func TestLegalMovesBlack(t *testing.T) {
 	PrintMoveList(&moveList)
 
 	// fmt.Println(len(moveList) / 4)
-	t.Errorf("Error")
+	// t.Errorf("Error")
 }
 
 func TestGetPinnedPieceRays(t *testing.T) {
@@ -132,7 +132,7 @@ func TestGetPinnedPieceRays(t *testing.T) {
 	for i := 0; i < pinRays.Count; i++ {
 		DrawBitboard(pinRays.Rays[i])
 	}
-	t.Errorf("Error")
+	// t.Errorf("Error")
 }
 
 func TestGetCheckerSliderRaysToKing(t *testing.T) {
@@ -143,7 +143,7 @@ func TestGetCheckerSliderRaysToKing(t *testing.T) {
 	DrawBitboard(checkerBitboard)
 	DrawBitboard(kingBitboard | checkerBitboard)
 	DrawBitboard(getCheckerSliderRaysToKing(kingBitboard, checkerBitboard))
-	t.Errorf("Error")
+	// t.Errorf("Error")
 }
 
 func BenchmarkGetCheckers(b *testing.B) {

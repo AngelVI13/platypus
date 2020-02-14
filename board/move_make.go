@@ -10,8 +10,6 @@ func (board *Board) addPieceToSq(pieceType, sq int) {
 
 // MakeMove makes a move
 func (board *Board) MakeMove(move int) {
-	board.UpdateBitMasks()
-
 	fromSq := FromSq(move)
 	toSq := ToSq(move)
 	pieceType := PieceType(move)
