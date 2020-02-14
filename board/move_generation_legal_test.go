@@ -1,7 +1,6 @@
 package board
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -10,7 +9,7 @@ func TestGetMoves(t *testing.T) {
 	board := Board{}
 	board.ParseFen("r6r/1b2k1bq/8/8/7B/8/8/R3K2R b QK - 3 2")
 	moveList := board.GetMoves()
-	if moveList.Count != 9 {
+	if moveList.Count != 8 {
 		PrintMoveList(&moveList)
 		t.Errorf("Expected 8 possible moves, got %d instead. Board: \n%s", moveList.Count, board.String())
 	}
@@ -94,10 +93,10 @@ func TestLegalMovesWhite(t *testing.T) {
 	// board.ParseFen("5kq1/2b5/8/4pP2/2K5/8/8/8 w - e6 0 1")
 	// board.ParseFen(StartingPosition)
 
-	fmt.Println(&board)
+	// fmt.Println(&board)
 	var moveList MoveList
 	board.LegalMovesWhite(&moveList)
-	PrintMoveList(&moveList)
+	// PrintMoveList(&moveList)
 
 	// fmt.Println(len(moveList) / 4)
 	// t.Errorf("Error")
@@ -111,10 +110,10 @@ func TestLegalMovesBlack(t *testing.T) {
 	// board.ParseFen("5kq1/2b5/8/4pP2/2K5/8/8/8 w - e6 0 1")
 	// board.ParseFen(StartingPosition)
 
-	fmt.Println(&board)
+	// fmt.Println(&board)
 	var moveList MoveList
 	board.LegalMovesBlack(&moveList)
-	PrintMoveList(&moveList)
+	// PrintMoveList(&moveList)
 
 	// fmt.Println(len(moveList) / 4)
 	// t.Errorf("Error")
@@ -129,9 +128,9 @@ func TestGetPinnedPieceRays(t *testing.T) {
 	var pinRays PinRays
 
 	board.getPinnedPieceRays(board.bitboards[WK], &pinRays)
-	for i := 0; i < pinRays.Count; i++ {
-		DrawBitboard(pinRays.Rays[i])
-	}
+	// for i := 0; i < pinRays.Count; i++ {
+	// 	DrawBitboard(pinRays.Rays[i])
+	// }
 	// t.Errorf("Error")
 }
 
@@ -139,10 +138,11 @@ func TestGetCheckerSliderRaysToKing(t *testing.T) {
 	var kingBitboard uint64 = (1 << 3)
 	var checkerBitboard uint64 = (1 << 24)
 
-	DrawBitboard(kingBitboard)
-	DrawBitboard(checkerBitboard)
-	DrawBitboard(kingBitboard | checkerBitboard)
-	DrawBitboard(getCheckerSliderRaysToKing(kingBitboard, checkerBitboard))
+	// DrawBitboard(kingBitboard)
+	// DrawBitboard(checkerBitboard)
+	// DrawBitboard(kingBitboard | checkerBitboard)
+	// DrawBitboard(getCheckerSliderRaysToKing(kingBitboard, checkerBitboard))
+	getCheckerSliderRaysToKing(kingBitboard, checkerBitboard)
 	// t.Errorf("Error")
 }
 

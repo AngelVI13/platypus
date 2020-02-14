@@ -20,7 +20,7 @@ func (board *Board) MakeMove(move int) {
 	board.addPieceToSq(pieceType, toSq)
 
 	if CastleFlag(move) == 1 {
-		PerftCastles++
+		// PerftCastles++
 
 		if pieceType == WK && toSq == G1 {
 			board.removePieceFromSq(WR, H1)
@@ -47,7 +47,7 @@ func (board *Board) MakeMove(move int) {
 	// if ToSq is occupied by one of enemy's pieces -> it was a capture
 	if (board.stateBoards[EnemyPieces]>>toSq)&1 == 1 {
 		board.fiftyMove = 0 // reset 50 move rule counter
-		PerftCaptures++
+		// PerftCaptures++
 
 		// todo this should be done only once for the current board state NOT on every makemove
 		var startRange int
@@ -70,7 +70,7 @@ func (board *Board) MakeMove(move int) {
 			}
 		}
 	} else if ((board.stateBoards[Empty]>>toSq)&1 == 1) && (EnPassantFlag(move) == 1) {
-		PerftEnPassant++
+		// PerftEnPassant++
 		// Otherwise if destination piece is empty but the move is enpassant -> remove captured piece
 		if board.Side == White {
 			board.removePieceFromSq(BP, toSq+8)
@@ -91,7 +91,7 @@ func (board *Board) MakeMove(move int) {
 	}
 
 	if promoted := Promoted(move); promoted > 0 {
-		PerftPromotions++
+		// PerftPromotions++
 		// todo update material here
 		board.addPieceToSq(promoted, toSq)
 		// we already move the pawn to the 8th rank and since it is a promotion
