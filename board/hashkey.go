@@ -1,6 +1,24 @@
 package board
 
-import "math/rand"
+import (
+	"math/bits"
+	"math/rand"
+)
+
+// PieceKeys hashkeys for each piece for each possible position for the key
+var PieceKeys [13][BoardSquareNum]uint64
+
+// SideKey the hashkey associated with the current side
+var SideKey uint64
+
+// CastleKeys haskeys associated with castling rights
+var CastleKeys [16]uint64 // castling value ranges from 0-15 -> we need 16 hashkeys
+
+// KnightMoves an array of bitboards indicating every square the knight can go to from a given board index
+var KnightMoves [BoardSquareNum]uint64
+
+// KingMoves an array of bitboards indicating every square the king can go to from a given board index
+var KingMoves [BoardSquareNum]uint64
 
 // InitHashKeys initializes hashkeys for all pieces and possible positions, for castling rights, for side to move
 func InitHashKeys() {
@@ -11,6 +29,7 @@ func InitHashKeys() {
 	}
 
 	SideKey = rand.Uint64()
+
 	for i := 0; i < 16; i++ {
 		CastleKeys[i] = rand.Uint64()
 	}
@@ -51,17 +70,27 @@ func InitHashKeys() {
 	}
 }
 
-// PieceKeys hashkeys for each piece for each possible position for the key
-var PieceKeys [13][BoardSquareNum]uint64
+// GeneratePositionKey takes a position and calculates a unique hashkey for it
+func GeneratePositionKey(board *Board) (hashKey uint64) {
+	for pieceType := WP; pieceType <= BK; pieceType++ {
+		bitboard := board.bitboards[pieceType]
 
-// SideKey the hashkey associated with the current side
-var SideKey uint64
+		piece := bitboard & (^(bitboard - 1))
+		for piece != 0 {
+			pieceSquare := bits.TrailingZeros64(piece)
+			hashKey ^= PieceKeys[pieceType][pieceSquare]
+		}
+	}
 
-// CastleKeys haskeys associated with castling rights
-var CastleKeys [16]uint64 // castling value ranges from 0-15 -> we need 16 hashkeys
+	// take bitboard of en passant file, select only the first rank, find which file it is
+	enPassantFile := bits.TrailingZeros64(board.bitboards[EP])
+	hashKey ^= PieceKeys[EP][enPassantFile]
 
-// KnightMoves an array of bitboards indicating every square the knight can go to from a given board index
-var KnightMoves [BoardSquareNum]uint64
+	if board.Side == White {
+		hashKey ^= SideKey
+	}
 
-// KingMoves an array of bitboards indicating every square the king can go to from a given board index
-var KingMoves [BoardSquareNum]uint64
+	hashKey ^= CastleKeys[board.castlePermissions]
+
+	return hashKey
+}

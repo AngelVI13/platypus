@@ -117,9 +117,9 @@ const (
 type Undo struct {
 	move              int
 	castlePermissions int
-	enPassantFile     int
+	enPassantFile     uint64
 	fiftyMove         int
-	posKey            uint64
+	positionKey       uint64
 }
 
 // Board Struct to represent the chess board
@@ -196,42 +196,6 @@ func (board *Board) String() string {
 	positionStr += fmt.Sprintf("\n")
 
 	return positionStr
-}
-
-// PrintBitboards Outputs all internal bitboards in an easy to view way
-func (board *Board) PrintBitboards() {
-	for idx, bitboard := range board.bitboards {
-		switch idx {
-		case WP:
-			fmt.Printf("WhitePawn bitboard:\n")
-		case BP:
-			fmt.Printf("BlackPawn bitboard:\n")
-		case WR:
-			fmt.Printf("WhiteRook bitboard:\n")
-		case BR:
-			fmt.Printf("BlackRook bitboard:\n")
-		case WN:
-			fmt.Printf("WhiteKnight bitboard:\n")
-		case BN:
-			fmt.Printf("BlackKnight bitboard:\n")
-		case WB:
-			fmt.Printf("WhiteBishop bitboard:\n")
-		case BB:
-			fmt.Printf("BlackBishop bitboard:\n")
-		case WQ:
-			fmt.Printf("WhiteQueen bitboard:\n")
-		case BQ:
-			fmt.Printf("BlackQueen bitboard:\n")
-		case WK:
-			fmt.Printf("WhiteKing bitboard:\n")
-		case BK:
-			fmt.Printf("BlackKing bitboard:\n")
-		case EP:
-			fmt.Printf("EnPassant bitboard:\n")
-		}
-		DrawBitboard(bitboard)
-		fmt.Println()
-	}
 }
 
 // UpdateBitMasks Updates all move generation/making related bit masks
