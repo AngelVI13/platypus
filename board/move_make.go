@@ -170,11 +170,11 @@ func (board *Board) TakeMove() {
 			board.removePieceFromSq(WR, D1)
 			board.addPieceToSq(WR, A1)
 		} else if pieceType == BK && toSq == G8 {
-			board.removePieceFromSq(WR, F8)
-			board.addPieceToSq(WR, H8)
-		} else if pieceType == WK && toSq == C8 {
-			board.removePieceFromSq(WR, D8)
-			board.addPieceToSq(WR, A8)
+			board.removePieceFromSq(BR, F8)
+			board.addPieceToSq(BR, H8)
+		} else if pieceType == BK && toSq == C8 {
+			board.removePieceFromSq(BR, D8)
+			board.addPieceToSq(BR, A8)
 		} else {
 			panic("Incorrect castle move")
 		}
