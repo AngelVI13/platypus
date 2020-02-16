@@ -127,6 +127,7 @@ func (board *Board) MakeMove(move int) {
 }
 
 // TakeMove Reverts last move
+// todo update TakeMove to handle board.position
 func (board *Board) TakeMove() {
 	board.ply--
 
