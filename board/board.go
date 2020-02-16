@@ -9,7 +9,8 @@ const StartingPosition string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w K
 
 // Indexes to access bitboards i.e. WP - white pawn, BB - black bishop
 const (
-	WP int = iota
+	NoPiece int = iota
+	WP
 	WN
 	WB
 	WR
@@ -124,8 +125,9 @@ type Undo struct {
 
 // Board Struct to represent the chess board
 type Board struct {
-	bitboards         [13]uint64
-	stateBoards       [10]uint64 // bitboards representing a state i.e. EnemyPieces, Empty, Occupied etc.
+	position          [BoardSquareNum]int // var to keep track of all pieces on the board
+	bitboards         [14]uint64          // 0- empty, 1-12 pieces WP-BK, 13 - en passant
+	stateBoards       [10]uint64          // bitboards representing a state i.e. EnemyPieces, Empty, Occupied etc.
 	Side              int
 	castlePermissions int
 	ply               int                // how many half moves have been made
@@ -137,7 +139,7 @@ type Board struct {
 // Reset Resets current board
 func (board *Board) Reset() {
 	// todo update with all variables
-	for i := 0; i < 13; i++ {
+	for i := 0; i < 14; i++ {
 		board.bitboards[i] = uint64(0)
 	}
 	board.Side = White

@@ -105,6 +105,8 @@ const (
 	C1 int = 58
 	C8 int = 2
 	G8 int = 6
+	E1 int = 60
+	E8 int = 4
 )
 
 // Move Move type

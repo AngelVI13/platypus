@@ -6,7 +6,7 @@ import (
 )
 
 // PieceKeys hashkeys for each piece for each possible position for the key
-var PieceKeys [13][BoardSquareNum]uint64
+var PieceKeys [14][BoardSquareNum]uint64
 
 // SideKey the hashkey associated with the current side
 var SideKey uint64
