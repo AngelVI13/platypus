@@ -16,7 +16,7 @@ func TestGetMoveIntPawnStart(t *testing.T) {
 	if Promoted(move) != WQ {
 		t.Error("Wrong PROMOTED piece")
 	}
-	if PieceType(move) != WP {
+	if Captured(move) != WP {
 		t.Error("Wrong PIECE_TYPE square")
 	}
 	if EnPassantFlag(move) != 0 {
@@ -43,7 +43,7 @@ func TestGetMoveIntCastle(t *testing.T) {
 	if Promoted(move) != WN {
 		t.Error("Wrong PROMOTED piece")
 	}
-	if PieceType(move) != WR {
+	if Captured(move) != WR {
 		t.Error("Wrong PIECE_TYPE square")
 	}
 	if EnPassantFlag(move) != 0 {
@@ -70,7 +70,7 @@ func TestGetMoveIntEnPassant(t *testing.T) {
 	if Promoted(move) != WR {
 		t.Error("Wrong PROMOTED piece")
 	}
-	if PieceType(move) != WB {
+	if Captured(move) != WB {
 		t.Error("Wrong PIECE_TYPE square")
 	}
 	if EnPassantFlag(move) != 1 {

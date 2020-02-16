@@ -5,11 +5,13 @@ import (
 )
 
 func (board *Board) removePieceFromSq(pieceType, sq int) {
+	board.position[sq] = NoPiece
 	board.bitboards[pieceType] &= (^(1 << sq))
 	board.positionKey ^= PieceKeys[pieceType][sq]
 }
 
 func (board *Board) addPieceToSq(pieceType, sq int) {
+	board.position[sq] = pieceType
 	board.bitboards[pieceType] |= 1 << sq
 	board.positionKey ^= PieceKeys[pieceType][sq]
 }
@@ -18,7 +20,7 @@ func (board *Board) addPieceToSq(pieceType, sq int) {
 func (board *Board) MakeMove(move int) {
 	fromSq := FromSq(move)
 	toSq := ToSq(move)
-	pieceType := PieceType(move)
+	pieceType := board.position[fromSq]
 
 	// Store has value before we do any hashing in/out of pieces etc
 	board.history[board.ply].positionKey = board.positionKey
@@ -137,7 +139,7 @@ func (board *Board) TakeMove() {
 	move := board.history[board.ply].move
 	fromSq := FromSq(move)
 	toSq := ToSq(move)
-	pieceType := PieceType(move)
+	pieceType := board.position[fromSq]
 
 	if board.bitboards[EP] != 0 {
 		board.positionKey ^= PieceKeys[EP][bits.TrailingZeros64(board.bitboards[EP])]
