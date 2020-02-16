@@ -162,7 +162,7 @@ func (board *Board) TakeMove() {
 
 	if CastleFlag(move) == 1 {
 		// PerftCastles++
-
+		// todo add test for this because there was a rook bug here and it was not caught by tests
 		if pieceType == WK && toSq == G1 {
 			board.removePieceFromSq(WR, F1)
 			board.addPieceToSq(WR, H1)
