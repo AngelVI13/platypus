@@ -157,59 +157,55 @@ func (board *Board) TakeMove() {
 
 	// Remove piece from to sq in piece's bitboard
 	board.removePieceFromSq(pieceType, toSq)
+	board.position[toSq] = NoPiece
 	// Add the piece to start sq in piece's bitboard
 	board.addPieceToSq(pieceType, fromSq)
-
+	board.position[fromSq] = pieceType
+	
 	if CastleFlag(move) == 1 {
 		// PerftCastles++
 		// todo add test for this because there was a rook bug here and it was not caught by tests
 		if pieceType == WK && toSq == G1 {
 			board.removePieceFromSq(WR, F1)
 			board.addPieceToSq(WR, H1)
+			board.position[F1] = NoPiece
+			board.position[H1] = WR
 		} else if pieceType == WK && toSq == C1 {
 			board.removePieceFromSq(WR, D1)
 			board.addPieceToSq(WR, A1)
+			board.position[D1] = NoPiece
+			board.position[A1] = WR
 		} else if pieceType == BK && toSq == G8 {
 			board.removePieceFromSq(BR, F8)
 			board.addPieceToSq(BR, H8)
+			board.position[F8] = NoPiece
+			board.position[H8] = BR
 		} else if pieceType == BK && toSq == C8 {
 			board.removePieceFromSq(BR, D8)
 			board.addPieceToSq(BR, A8)
+			board.position[D8] = NoPiece
+			board.position[A8] = BR
 		} else {
 			panic("Incorrect castle move")
 		}
 	}
 
-	// todo Need to keep track of what piece is captured so that I an reinsert it here -> need to keep a [64]int of all piece on the board
-	// if ToSq is occupied by one of enemy's pieces -> it was a capture
-	if (board.stateBoards[EnemyPieces]>>toSq)&1 == 1 {
-		// todo this should be done only once for the current board state NOT on every makemove
-		var startRange int
-		var endRange int
-		if board.Side == White {
-			// if current side is white the we capture from blacks pieces
-			startRange = BP
-			endRange = BK
-		} else {
-			startRange = WP
-			endRange = WK
-		}
+	capturedPiece := Captured(move)
+	if capturedPiece != NoPiece && EnPassantFlag(move) == 0 {
+		board.addPieceToSq(capturedPiece, toSq) // add enemy piece from its board
+		board.position[toSq] = capturedPiece
+	} else if (capturedPiece == WP || capturedPiece == BP) && EnPassantFlag(move) == 1 {
 
-		for i := startRange; i <= endRange; i++ {
-			// if destination square is on the board -> must be the correct board for the capture
-			if (board.bitboards[i]>>toSq)&1 == 1 {
-				// todo update material here
-				board.removePieceFromSq(i, toSq) // remove enemy piece from its board
-				break
-			}
-		}
-	} else if ((board.stateBoards[Empty]>>toSq)&1 == 1) && (EnPassantFlag(move) == 1) {
+		// todo finalize this code
 		// PerftEnPassant++
 		// Otherwise if destination piece is empty but the move is enpassant -> remove captured piece
 		if board.Side == White {
 			board.removePieceFromSq(BP, toSq+8)
+			// note: need to remove capture enpassant pawn since it is not in fromSq or toSq
+			board.position[toSq+8] = NoPiece
 		} else {
 			board.removePieceFromSq(WP, toSq-8)
+			board.position[toSq-8] = NoPiece
 		}
 	}
 }
