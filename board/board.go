@@ -9,6 +9,7 @@ import (
 const StartingPosition string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 const SideChar string = "wb-"
+const PieceChar string = ".PNBRQKpnbrqk"
 
 // Indexes to access bitboards i.e. WP - white pawn, BB - black bishop
 const (

@@ -1,17 +1,20 @@
 package board
 
 import (
+	// "fmt"
 	"math/bits"
 )
 
 func (board *Board) removePieceFromSq(pieceType, sq int) {
 	board.bitboards[pieceType] &= (^(1 << sq))
 	board.positionKey ^= PieceKeys[pieceType][sq]
+	// fmt.Printf("-Unhashing piece %c from sq %s\n", PieceChar[pieceType], GetSquareString(sq))
 }
 
 func (board *Board) addPieceToSq(pieceType, sq int) {
 	board.bitboards[pieceType] |= 1 << sq
 	board.positionKey ^= PieceKeys[pieceType][sq]
+	// fmt.Printf("+Hashing piece %c from sq %s\n", PieceChar[pieceType], GetSquareString(sq))
 }
 
 // MakeMove makes a move
@@ -19,7 +22,6 @@ func (board *Board) MakeMove(move int) {
 	fromSq := FromSq(move)
 	toSq := ToSq(move)
 	pieceType := board.position[fromSq]
-	capturedPiece := board.position[toSq]
 
 	// Store hash value before we do any hashing in/out of pieces etc
 	board.history[board.ply].positionKey = board.positionKey
@@ -33,6 +35,7 @@ func (board *Board) MakeMove(move int) {
 	board.addPieceToSq(pieceType, toSq)
 	board.position[toSq] = pieceType
 
+	// handle rook moves if castling is performed
 	if CastleFlag(move) == 1 {
 		// PerftCastles++
 
@@ -61,7 +64,12 @@ func (board *Board) MakeMove(move int) {
 		}
 	}
 
-	// capturedPiece := Captured(move)
+	// We need to get the captured piece from the move int
+	// instead of directly from position[toSq] because in the
+	// case of en-passant captures the toSq has no piece on it
+	// however, the move int will indicate that there was a capture
+	// and what the captured piece actually is
+	capturedPiece := Captured(move)
 	if capturedPiece != NoPiece && EnPassantFlag(move) == 0 {
 		board.fiftyMove = 0 // reset 50 move rule counter
 
@@ -82,18 +90,23 @@ func (board *Board) MakeMove(move int) {
 		}
 	}
 
-	// if en passant was set before this move then remove it
-	// en passant is only available immediately after pawn start
+	// If en passant was set before this move then remove it!
+	// En passant is only available immediately after pawn start.
+	// En passant might be set a bit later in this function
+	// when we check if this move was a pawn start.
 	if board.bitboards[EP] != 0 {
 		enPassantFile := bits.TrailingZeros64(board.bitboards[EP])
 		board.positionKey ^= PieceKeys[EP][enPassantFile]
+		// fmt.Printf("-Unhashing enpass file %d\n", enPassantFile)
 		board.history[board.ply].enPassantFile = board.bitboards[EP]
 		board.bitboards[EP] = 0
 	}
 
 	// hash out the castling permissions
 	board.positionKey ^= CastleKeys[board.castlePermissions]
+	// fmt.Printf("-Unhashing castle perm %d\n", board.castlePermissions)
 
+	// store history variables
 	board.history[board.ply].move = move
 	board.history[board.ply].fiftyMove = board.fiftyMove
 	board.history[board.ply].castlePermissions = board.castlePermissions
@@ -104,11 +117,13 @@ func (board *Board) MakeMove(move int) {
 
 	// hash back in the castling perm
 	board.positionKey ^= CastleKeys[board.castlePermissions]
+	// fmt.Printf("+Hashing castle perm %d\n", board.castlePermissions)
 
 	// if a pawn start -> update EnPassant bitboard
 	if PawnStartFlag(move) == 1 {
 		board.bitboards[EP] = FileMasks8[toSq%8]
 		board.positionKey ^= PieceKeys[EP][bits.TrailingZeros64(board.bitboards[EP])]
+		// fmt.Printf("+Hashing enpass file %d\n", toSq%8)
 	}
 
 	if promoted := Promoted(move); promoted > 0 {
@@ -124,6 +139,7 @@ func (board *Board) MakeMove(move int) {
 	board.ply++     // increase halfmove counter
 	board.Side ^= 1 // change side to move
 	board.positionKey ^= SideKey
+	// fmt.Printf("+Hashing side key %d\n", SideKey)
 }
 
 // TakeMove Reverts last move
@@ -138,10 +154,15 @@ func (board *Board) TakeMove() {
 	pieceType := board.position[toSq]
 
 	if board.bitboards[EP] != 0 {
-		// if enpassant is active, deactivate it
+		// Unhash enpassant if it was active(hashed)
+		// This might be hashed again later if the previous move also
+		// had an active en passant file.
 		board.positionKey ^= PieceKeys[EP][bits.TrailingZeros64(board.bitboards[EP])]
+		// fmt.Printf("-Unhashing enpass file %d\n", bits.TrailingZeros64(board.bitboards[EP]))
 	}
 
+	// fmt.Printf("-Unhashing castle perm %d\n", board.castlePermissions)
+	// unhash current castling permissions and hash in the permissions from the last move (below)
 	board.positionKey ^= CastleKeys[board.castlePermissions]
 
 	board.castlePermissions = board.history[board.ply].castlePermissions
@@ -149,13 +170,18 @@ func (board *Board) TakeMove() {
 	board.bitboards[EP] = board.history[board.ply].enPassantFile
 
 	if board.bitboards[EP] != 0 {
+		// if en passant was active in the previous position - hash it in
 		board.positionKey ^= PieceKeys[EP][bits.TrailingZeros64(board.bitboards[EP])]
+		// fmt.Printf("+Hashing enpass file %d\n", bits.TrailingZeros64(board.bitboards[EP]))
 	}
 
 	board.positionKey ^= CastleKeys[board.castlePermissions]
+	// fmt.Printf("+Hashing castle perm %d\n", board.castlePermissions)
 
+	// change side and hash in the side key
 	board.Side ^= 1
 	board.positionKey ^= SideKey
+	// fmt.Printf("+Hashing side key %d\n", SideKey)
 
 	// Remove piece from to sq in piece's bitboard
 	board.removePieceFromSq(pieceType, toSq)
@@ -165,8 +191,6 @@ func (board *Board) TakeMove() {
 	board.position[fromSq] = pieceType
 
 	if CastleFlag(move) == 1 {
-		// PerftCastles++
-		// todo add test for this because there was a rook bug here and it was not caught by tests
 		if pieceType == WK && toSq == G1 {
 			board.removePieceFromSq(WR, F1)
 			board.addPieceToSq(WR, H1)
@@ -206,5 +230,22 @@ func (board *Board) TakeMove() {
 			board.addPieceToSq(WP, toSq-8)
 			board.position[toSq-8] = WP
 		}
+	}
+
+	if promoted := Promoted(move); promoted > 0 {
+		// So far we have moved back the piece to original square
+		// however, when we have promotions we have ended up
+		// moving the promoted piece back. So here we need to
+		// replace the promoted piece with a pawn of the corresponding
+		// color
+		board.removePieceFromSq(promoted, fromSq)
+
+		pawn := BP
+		if board.Side == White {
+			pawn = WP
+		}
+
+		board.addPieceToSq(pawn, fromSq)
+		board.position[fromSq] = pawn
 	}
 }

@@ -1,6 +1,7 @@
 package board
 
 import (
+	// "fmt"
 	"testing"
 )
 
@@ -11,7 +12,7 @@ func TestPerftStartingPosition(t *testing.T) {
 
 	PerftMoveCounter = 0
 	PerftMaxDepth = 5
-	Perft(board, 0)
+	Perft(&board, 0)
 	// fmt.Println(PerftMoveCounter)
 	// fmt.Println(PerftCaptures)
 	// fmt.Println(PerftEnPassant)
@@ -28,7 +29,7 @@ func TestPerftPosition1(t *testing.T) {
 
 	PerftMoveCounter = 0
 	PerftMaxDepth = 3
-	Perft(board, 0)
+	Perft(&board, 0)
 	if PerftMoveCounter != 62379 {
 		t.Errorf("Expected 62379 possible moves, got %d instead.", PerftMoveCounter)
 	}
@@ -41,7 +42,7 @@ func TestPerftPosition2(t *testing.T) {
 
 	PerftMoveCounter = 0
 	PerftMaxDepth = 3
-	Perft(board, 0)
+	Perft(&board, 0)
 	if PerftMoveCounter != 89890 {
 		t.Errorf("Expected 89890 possible moves, got %d instead.", PerftMoveCounter)
 	}
@@ -57,7 +58,7 @@ func BenchmarkPerftStartingPositionDepth3(b *testing.B) {
 	// This performs ~54% faster than hugo
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		Perft(board, 0)
+		Perft(&board, 0)
 	}
 	b.StopTimer()
 }
