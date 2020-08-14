@@ -1,9 +1,13 @@
 package board
 
 import (
-	// "fmt"
+	"fmt"
+	"io/ioutil"
+	"encoding/json"
 	"testing"
 )
+
+// todo add automatic testing of all positions from test_positions.json
 
 func TestPerftStartingPosition(t *testing.T) {
 	InitHashKeys()
@@ -45,6 +49,49 @@ func TestPerftPosition2(t *testing.T) {
 	Perft(&board, 0)
 	if PerftMoveCounter != 89890 {
 		t.Errorf("Expected 89890 possible moves, got %d instead.", PerftMoveCounter)
+	}
+}
+
+type PerftPosition struct {
+	Depth int `json:"depth"`
+	Nodes int `json:"nodes"`
+	Fen string `json:"fen"`
+}
+
+func TestPerftPositions(t *testing.T) {
+	testFile := "../test_positions.json"
+
+	InitHashKeys()
+	var positions []PerftPosition
+	
+	dat, err := ioutil.ReadFile(testFile)
+	if err != nil {
+		panic(err)
+	}
+	
+	err = json.Unmarshal(dat, &positions)
+	if err != nil {
+		panic(err)
+	}
+
+	for i, position := range positions {
+		board := Board{}
+		board.ParseFen(position.Fen)
+		fmt.Println(&board)
+		fmt.Printf("%#v\n", position)
+
+		PerftMoveCounter = 0
+		PerftMaxDepth = position.Depth
+		Perft(&board, 0)
+
+		if i == 9 {
+			break
+		}
+
+		if PerftMoveCounter != position.Nodes {
+			t.Errorf("I=%d: Expected %d possible moves, got %d instead. \nFEN: %s\n", 
+				i, position.Nodes, PerftMoveCounter, position.Fen)
+		}
 	}
 }
 
