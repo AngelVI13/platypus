@@ -21,7 +21,7 @@ func (board *Board) MakeMove(move int) {
 	pieceType := board.position[fromSq]
 	capturedPiece := board.position[toSq]
 
-	// Store has value before we do any hashing in/out of pieces etc
+	// Store hash value before we do any hashing in/out of pieces etc
 	board.history[board.ply].positionKey = board.positionKey
 
 	board.fiftyMove++ // increment fifty move rule
@@ -47,8 +47,8 @@ func (board *Board) MakeMove(move int) {
 			board.position[A1] = NoPiece
 			board.position[D1] = WR
 		} else if pieceType == BK && toSq == G8 {
-			board.removePieceFromSq(WR, H8)
-			board.addPieceToSq(WR, F8)
+			board.removePieceFromSq(BR, H8)
+			board.addPieceToSq(BR, F8)
 			board.position[H8] = NoPiece
 			board.position[F8] = BR
 		} else if pieceType == BK && toSq == C8 {
@@ -98,7 +98,7 @@ func (board *Board) MakeMove(move int) {
 	board.history[board.ply].fiftyMove = board.fiftyMove
 	board.history[board.ply].castlePermissions = board.castlePermissions
 
-	// if a rook or king has moved the remove the respective castling permission from castlePerm
+	// if a rook or king has moved then remove the respective castling permission from castlePerm
 	board.castlePermissions &= CastlePerm[fromSq]
 	board.castlePermissions &= CastlePerm[toSq]
 
@@ -127,16 +127,18 @@ func (board *Board) MakeMove(move int) {
 }
 
 // TakeMove Reverts last move
-// todo update TakeMove to handle board.position
 func (board *Board) TakeMove() {
 	board.ply--
 
+	// get history for previous move in the ply
 	move := board.history[board.ply].move
 	fromSq := FromSq(move)
 	toSq := ToSq(move)
-	pieceType := board.position[fromSq]
+	// the moved piece type is the piece in the to square
+	pieceType := board.position[toSq]
 
 	if board.bitboards[EP] != 0 {
+		// if enpassant is active, deactivate it
 		board.positionKey ^= PieceKeys[EP][bits.TrailingZeros64(board.bitboards[EP])]
 	}
 
@@ -161,7 +163,7 @@ func (board *Board) TakeMove() {
 	// Add the piece to start sq in piece's bitboard
 	board.addPieceToSq(pieceType, fromSq)
 	board.position[fromSq] = pieceType
-	
+
 	if CastleFlag(move) == 1 {
 		// PerftCastles++
 		// todo add test for this because there was a rook bug here and it was not caught by tests
@@ -195,17 +197,14 @@ func (board *Board) TakeMove() {
 		board.addPieceToSq(capturedPiece, toSq) // add enemy piece from its board
 		board.position[toSq] = capturedPiece
 	} else if (capturedPiece == WP || capturedPiece == BP) && EnPassantFlag(move) == 1 {
-
-		// todo finalize this code
-		// PerftEnPassant++
-		// Otherwise if destination piece is empty but the move is enpassant -> remove captured piece
+		// re-add enpassant captured pawn
 		if board.Side == White {
-			board.removePieceFromSq(BP, toSq+8)
-			// note: need to remove capture enpassant pawn since it is not in fromSq or toSq
-			board.position[toSq+8] = NoPiece
+			board.addPieceToSq(BP, toSq+8)
+			// add captured enpassant pawn to piece bitboard
+			board.position[toSq+8] = BP
 		} else {
-			board.removePieceFromSq(WP, toSq-8)
-			board.position[toSq-8] = NoPiece
+			board.addPieceToSq(WP, toSq-8)
+			board.position[toSq-8] = WP
 		}
 	}
 }

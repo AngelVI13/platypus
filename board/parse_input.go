@@ -3,6 +3,7 @@ package board
 import (
 	"fmt"
 	"strconv"
+	"math/bits"
 )
 
 // PieceNotationMap maps piece notations (i.e. 'p', 'N') to piece values (i.e. 'BlackPawn', 'WhiteKnight')
@@ -51,6 +52,7 @@ func (board *Board) ParseFen(fen string) {
 
 		board.bitboards[piece] |= (1 << count)
 		board.position[count] = piece
+		board.positionKey ^= PieceKeys[piece][count] // hash piece in
 		char++
 		count++
 	}
@@ -61,6 +63,8 @@ func (board *Board) ParseFen(fen string) {
 	newChar = string(fen[char])
 	if newChar == "w" {
 		board.Side = White
+		// hash side (side key is only added for one side)
+		board.positionKey ^= SideKey 
 	} else if newChar == "b" {
 		board.Side = Black
 	} else {
@@ -91,6 +95,8 @@ func (board *Board) ParseFen(fen string) {
 		}
 		char++
 	}
+	// hash castle permissions
+	board.positionKey ^= CastleKeys[board.castlePermissions]
 
 	// AssertTrue(pos.castlePerm >= 0 && pos.castlePerm <= 15)
 	// move to the en passant square related part of FEN
@@ -106,8 +112,7 @@ func (board *Board) ParseFen(fen string) {
 		}
 
 		board.bitboards[EP] = FileMasks8[file]
+		// hash en passant
+		board.positionKey ^= PieceKeys[EP][bits.TrailingZeros64(board.bitboards[EP])]
 	}
-
-	// pos.posKey = GeneratePosKey(pos) // generate pos key for new position
-
 }

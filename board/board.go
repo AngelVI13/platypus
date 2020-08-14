@@ -2,10 +2,13 @@ package board
 
 import (
 	"fmt"
+	"math/bits"
 )
 
 // StartingPosition 8x8 representation of normal chess starting position
 const StartingPosition string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+const SideChar string = "wb-"
 
 // Indexes to access bitboards i.e. WP - white pawn, BB - black bishop
 const (
@@ -142,9 +145,18 @@ func (board *Board) Reset() {
 	for i := 0; i < 14; i++ {
 		board.bitboards[i] = uint64(0)
 	}
+	for i := 0; i < BoardSquareNum; i++ {
+		board.position[i] = 0
+	}
+	for i := 0; i < 10; i++ {
+		board.stateBoards[i] = uint64(0)
+	}
+
 	board.Side = White
 	board.castlePermissions = 0
+	board.ply = 0
 	board.fiftyMove = 0
+	board.positionKey = 0
 }
 
 // String Return string representing the current board (from the stored bitboards)
@@ -196,6 +208,38 @@ func (board *Board) String() string {
 		positionStr += fmt.Sprintf("%s  ", string(i))
 	}
 	positionStr += fmt.Sprintf("\n")
+
+
+	// ---
+	positionStr += fmt.Sprintf("side:%c\n", SideChar[board.Side])
+	positionStr += fmt.Sprintf("enPasFile:%d\n", bits.TrailingZeros64(board.bitboards[EP]))
+	
+	// Compute castling permissions
+	wKCA := "-"
+	if board.castlePermissions&WhiteKingCastling != 0 {
+		wKCA = "K"
+	}
+
+	wQCA := "-"
+	if board.castlePermissions&WhiteQueenCastling != 0 {
+		wQCA = "Q"
+	}
+
+	bKCA := "-"
+	if board.castlePermissions&BlackKingCastling != 0 {
+		bKCA = "k"
+	}
+
+	bQCA := "-"
+	if board.castlePermissions&BlackQueenCastling != 0 {
+		bQCA = "q"
+	}
+
+	positionStr += fmt.Sprintf("castle:%s%s%s%s\n", wKCA, wQCA, bKCA, bQCA)
+	positionStr += fmt.Sprintf("PosKey:%X\n", board.positionKey)
+
+	// ---
+
 
 	return positionStr
 }

@@ -888,10 +888,10 @@ func (board *Board) possibleCastleWhite(moveList *MoveList) {
 	var kingSideSqBitboard uint64 = 1<<(kingIdx+1) | 1<<(kingIdx+2)
 
 	if (board.castlePermissions&WhiteKingCastling) != 0 && (bits.OnesCount64((kingSideSqBitboard|board.bitboards[WK]) & ^unsafe) == 3) && (bits.OnesCount64(empty&kingSideSqBitboard) == 2) {
-		moveList.AddMove(GetMoveInt(E1, G1, WK, NoPiece, MoveFlagCastle))
+		moveList.AddMove(GetMoveInt(E1, G1, NoPiece, NoPiece, MoveFlagCastle))
 	}
 	if (board.castlePermissions&WhiteQueenCastling) != 0 && (bits.OnesCount64((queenSideSqBitboard|board.bitboards[WK]) & ^unsafe) == 3) && (bits.OnesCount64(empty&(queenSideSqBitboard|1<<(kingIdx-3))) == 3) { // on the queen side there are 3 sq that should be empty to enable castling
-		moveList.AddMove(GetMoveInt(E1, C1, WK, NoPiece, MoveFlagCastle))
+		moveList.AddMove(GetMoveInt(E1, C1, NoPiece, NoPiece, MoveFlagCastle))
 	}
 }
 
@@ -904,9 +904,9 @@ func (board *Board) possibleCastleBlack(moveList *MoveList) {
 	var kingSideSqBitboard uint64 = 1<<(kingIdx+1) | 1<<(kingIdx+2)
 
 	if (board.castlePermissions&BlackKingCastling) != 0 && (bits.OnesCount64((kingSideSqBitboard|board.bitboards[BK]) & ^unsafe) == 3) && (bits.OnesCount64(empty&kingSideSqBitboard) == 2) {
-		moveList.AddMove(GetMoveInt(E8, G8, BK, NoPiece, MoveFlagCastle))
+		moveList.AddMove(GetMoveInt(E8, G8, NoPiece, NoPiece, MoveFlagCastle))
 	}
 	if (board.castlePermissions&BlackQueenCastling) != 0 && (bits.OnesCount64((queenSideSqBitboard|board.bitboards[BK]) & ^unsafe) == 3) && (bits.OnesCount64(empty&(queenSideSqBitboard|1<<(kingIdx-3))) == 3) {
-		moveList.AddMove(GetMoveInt(E8, C8, BK, NoPiece, MoveFlagCastle))
+		moveList.AddMove(GetMoveInt(E8, C8, NoPiece, NoPiece, MoveFlagCastle))
 	}
 }
