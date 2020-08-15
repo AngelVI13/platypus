@@ -364,9 +364,6 @@ func (board *Board) LegalMovesWhite(moveList *MoveList) {
 
 	board.getPinnedPieceRays(board.bitboards[WK], &pinRays)
 
-	// for i := 0; i < pinRays.Count; i++ {
-	// 	DrawBitboard(pinRays.Rays[i])
-	// }
 	board.possibleWhitePawn(moveList, pushMask, captureMask, &pinRays)
 	board.possibleKnightMoves(moveList, board.bitboards[WN], pushMask, captureMask, &pinRays)
 	board.possibleBishopMoves(moveList, board.bitboards[WB], pushMask, captureMask, &pinRays)
@@ -573,7 +570,9 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 		occupied ^= (1 << (index - 1)) | (1 << index)
 		kingIdx := bits.TrailingZeros64(board.bitboards[WK])
 		horizontalMoves := board.HorizontalAndVerticalMoves(kingIdx, occupied)
+		diagonalMoves := board.DiagonalAndAntiDiagonalMoves(kingIdx, occupied)
 		checkers := horizontalMoves & board.stateBoards[EnemyRooksQueens]
+		checkers |= diagonalMoves & board.stateBoards[EnemyBishopsQueens]
 
 		if checkers == 0 {
 			moveList.AddMove(GetMoveInt(index-1, index-8, BP, NoPiece, MoveFlagEnPass))
@@ -588,7 +587,9 @@ func (board *Board) possibleWhitePawn(moveList *MoveList, pushMask, captureMask 
 		occupied ^= (1 << (index + 1)) | (1 << index)
 		kingIdx := bits.TrailingZeros64(board.bitboards[WK])
 		horizontalMoves := board.HorizontalAndVerticalMoves(kingIdx, occupied)
+		diagonalMoves := board.DiagonalAndAntiDiagonalMoves(kingIdx, occupied)
 		checkers := horizontalMoves & board.stateBoards[EnemyRooksQueens]
+		checkers |= diagonalMoves & board.stateBoards[EnemyBishopsQueens]
 
 		if checkers == 0 {
 			moveList.AddMove(GetMoveInt(index+1, index-8, BP, NoPiece, MoveFlagEnPass))
@@ -726,7 +727,9 @@ func (board *Board) possibleBlackPawn(moveList *MoveList, pushMask, captureMask 
 		occupied ^= (1 << (index + 1)) | (1 << index)
 		kingIdx := bits.TrailingZeros64(board.bitboards[BK])
 		horizontalMoves := board.HorizontalAndVerticalMoves(kingIdx, occupied)
+		diagonalMoves := board.DiagonalAndAntiDiagonalMoves(kingIdx, occupied)
 		checkers := horizontalMoves & board.stateBoards[EnemyRooksQueens]
+		checkers |= diagonalMoves & board.stateBoards[EnemyBishopsQueens]
 
 		if checkers == 0 {
 			moveList.AddMove(GetMoveInt(index+1, index+8, WP, NoPiece, MoveFlagEnPass))
@@ -741,7 +744,9 @@ func (board *Board) possibleBlackPawn(moveList *MoveList, pushMask, captureMask 
 		occupied ^= (1 << (index - 1)) | (1 << index)
 		kingIdx := bits.TrailingZeros64(board.bitboards[BK])
 		horizontalMoves := board.HorizontalAndVerticalMoves(kingIdx, occupied)
+		diagonalMoves := board.DiagonalAndAntiDiagonalMoves(kingIdx, occupied)
 		checkers := horizontalMoves & board.stateBoards[EnemyRooksQueens]
+		checkers |= diagonalMoves & board.stateBoards[EnemyBishopsQueens]
 
 		if checkers == 0 {
 			moveList.AddMove(GetMoveInt(index-1, index+8, WP, NoPiece, MoveFlagEnPass))

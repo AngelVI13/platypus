@@ -1,5 +1,7 @@
 package board
 
+// import "fmt"
+
 var PerftMoveCounter int
 var PerftMaxDepth int
 var PerftCaptures int
@@ -15,10 +17,8 @@ func Perft(board *Board, depth int) {
 		for i := 0; i < moveList.Count; i++ {
 			move := moveList.Moves[i].Move
 			
-			// fmt.Printf("Making move: %s\n", GetMoveString(move))
 			board.MakeMove(move)
-			// fmt.Println(&moveBoard)
-
+			
 			// var currentMoveCount int
 			// if depth == 0 {
 			// 	currentMoveCount = PerftMoveCounter

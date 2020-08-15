@@ -1,7 +1,6 @@
 package board
 
 import (
-	"fmt"
 	"io/ioutil"
 	"encoding/json"
 	"testing"
@@ -77,16 +76,10 @@ func TestPerftPositions(t *testing.T) {
 	for i, position := range positions {
 		board := Board{}
 		board.ParseFen(position.Fen)
-		fmt.Println(&board)
-		fmt.Printf("%#v\n", position)
-
+		
 		PerftMoveCounter = 0
 		PerftMaxDepth = position.Depth
 		Perft(&board, 0)
-
-		if i == 9 {
-			break
-		}
 
 		if PerftMoveCounter != position.Nodes {
 			t.Errorf("I=%d: Expected %d possible moves, got %d instead. \nFEN: %s\n", 
