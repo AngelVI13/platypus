@@ -880,6 +880,12 @@ func (board *Board) possibleKingMoves(moveList *MoveList, king uint64) {
 }
 
 func (board *Board) possibleCastleWhite(moveList *MoveList) {
+	// if no castling is allowed -> return early
+	if (board.castlePermissions&WhiteKingCastling) == 0 && 
+		(board.castlePermissions&WhiteQueenCastling) == 0 {
+		return
+	}
+	
 	empty := board.stateBoards[Empty]
 	unsafe := board.stateBoards[Unsafe]
 
@@ -896,10 +902,17 @@ func (board *Board) possibleCastleWhite(moveList *MoveList) {
 }
 
 func (board *Board) possibleCastleBlack(moveList *MoveList) {
+	// if no castling is allowed -> return early
+	if (board.castlePermissions&BlackKingCastling) == 0 && 
+		(board.castlePermissions&BlackQueenCastling) == 0 {
+		return
+	}	
+
 	empty := board.stateBoards[Empty]
 	unsafe := board.stateBoards[Unsafe]
 
 	kingIdx := bits.TrailingZeros64(board.bitboards[BK])
+
 	var queenSideSqBitboard uint64 = 1<<(kingIdx-1) | 1<<(kingIdx-2)
 	var kingSideSqBitboard uint64 = 1<<(kingIdx+1) | 1<<(kingIdx+2)
 
