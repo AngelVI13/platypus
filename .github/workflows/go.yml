@@ -21,10 +21,9 @@ jobs:
 
     - name: Build
       #go build .
-      run: |
-        pwd
-        echo ${GOPATH}
-        echo ${GOROOT}
+      run: go build .
+      env:
+        GOPATH: /home/runner/work/
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2.1.4
