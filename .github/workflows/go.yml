@@ -20,7 +20,7 @@ jobs:
 
     - name: Build
       #go build .
-      run: go build
+      run: go build -o platypus.exe
       env:
         GOPATH: /home/runner/work/platypus/go
 
