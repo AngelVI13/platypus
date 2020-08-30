@@ -16,12 +16,12 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
-    - name: Set environmental variables
-      run: export GOPATH=${GOPATH}:$(pwd)
-
     - name: Build
       #go build .
-      run: go build .
+      run: |
+        pwd
+        echo ${GOPATH}
+        go build .
       env:
         GOPATH: /home/runner/work/
 
