@@ -25,7 +25,7 @@ jobs:
         echo ${GOPATH}
         go build .
       env:
-        GOPATH: /home/runner/work/go
+        GOPATH: /home/runner/work/platypus/go
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2.1.4
