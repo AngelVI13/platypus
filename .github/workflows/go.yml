@@ -20,7 +20,7 @@ jobs:
       run: export GOPATH=${GOPATH}:$(pwd)
 
     - name: Build
-      run: go build
+      run: go build .
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2.1.4
