@@ -84,13 +84,19 @@ const (
 	Both
 )
 
+// MaxGameMoves Maximum number of game moves
+const (
+	MaxGameMoves   int = 2048
+	BoardSquareNum int = 64
+)
+
 // CastlePerm used to simplify hashing castle permissions
 // Everytime we make a move we will take pos.castlePerm &= CastlePerm[sq]
 // in this way if any of the rooks or the king moves, the castle permission will be
 // disabled for that side. In any other move, the castle permissions will remain the
 // same, since 15 is the max number associated with all possible castling permissions
 // for both sides
-var CastlePerm = [64]int{
+var CastlePerm = [BoardSquareNum]int{
 	7, 15, 15, 15, 3, 15, 15, 11,
 	15, 15, 15, 15, 15, 15, 15, 15,
 	15, 15, 15, 15, 15, 15, 15, 15,
@@ -100,12 +106,6 @@ var CastlePerm = [64]int{
 	15, 15, 15, 15, 15, 15, 15, 15,
 	13, 15, 15, 15, 12, 15, 15, 14,
 }
-
-// MaxGameMoves Maximum number of game moves
-const (
-	MaxGameMoves   int = 2048
-	BoardSquareNum int = 64
-)
 
 // Defines for castling rights
 // The values are such that they each represent a bit from a 4 bit int value
@@ -134,6 +134,7 @@ type Board struct {
 	stateBoards       [10]uint64          // bitboards representing a state i.e. EnemyPieces, Empty, Occupied etc.
 	Side              int
 	castlePermissions int
+	material          [2]int             // material scores for black and white
 	ply               int                // how many half moves have been made
 	fiftyMove         int                // how many moves from the fifty move rule have been made
 	positionKey       uint64             // position key is a unique key stored for each position (used to keep track of 3fold repetition)
@@ -155,6 +156,8 @@ func (board *Board) Reset() {
 
 	board.Side = White
 	board.castlePermissions = 0
+	board.material[White] = 0
+	board.material[Black] = 0
 	board.ply = 0
 	board.fiftyMove = 0
 	board.positionKey = 0

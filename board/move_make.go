@@ -8,12 +8,14 @@ import (
 func (board *Board) removePieceFromSq(pieceType, sq int) {
 	board.bitboards[pieceType] &= (^(1 << sq))
 	board.positionKey ^= PieceKeys[pieceType][sq]
+	board.material[board.Side] -= PieceValue[pieceType]
 	// fmt.Printf("-Unhashing piece %c from sq %s\n", PieceChar[pieceType], GetSquareString(sq))
 }
 
 func (board *Board) addPieceToSq(pieceType, sq int) {
 	board.bitboards[pieceType] |= 1 << sq
 	board.positionKey ^= PieceKeys[pieceType][sq]
+	board.material[board.Side] += PieceValue[pieceType]
 	// fmt.Printf("+Hashing piece %c from sq %s\n", PieceChar[pieceType], GetSquareString(sq))
 }
 

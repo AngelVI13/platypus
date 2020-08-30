@@ -49,10 +49,15 @@ func (board *Board) ParseFen(fen string) {
 		default:
 			panic("FEN error")
 		}
+		// compute piece color based on piece type
+		color := Black
+		if piece < BP {
+			color = White
+		}
 
 		board.bitboards[piece] |= (1 << count)
 		board.position[count] = piece
-		board.positionKey ^= PieceKeys[piece][count] // hash piece in
+		board.material[color] += PieceValue[piece]
 		char++
 		count++
 	}
