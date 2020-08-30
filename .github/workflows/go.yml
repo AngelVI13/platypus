@@ -21,7 +21,7 @@ jobs:
     - name: Build
       #go build .
       run: |
-        ls -al ..
+        ls -al ../..
         go build .
       env:
         GOPATH: /home/runner/work/platypus/go
