@@ -12,7 +12,7 @@ func TestMakeMoveStartPos(t *testing.T) {
 
 	InitHashKeys()
 	board := Board{}
-	board.ParseFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+	board.ParseFen(StartingPosition)
 
 	moveList := board.GetMoves()
 	move := moveList.Moves[0].Move
@@ -34,7 +34,7 @@ func TestMakeMoveTwoStartPos(t *testing.T) {
 
 	InitHashKeys()
 	board := Board{}
-	board.ParseFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+	board.ParseFen(StartingPosition)
 
 	// first move
 	moveList := board.GetMoves()

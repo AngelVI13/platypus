@@ -190,10 +190,13 @@ func (board *Board) EvalPosition() int {
 func MirrorBoard(board *Board) {
    var swapPiece = [14]int{NoPiece, BP, BN, BB, BR, BQ, BK, WP, WN, WB, WR, WQ, WK, EP }
    var tempMaterial = [2]int{0, 0}
+   var tempPosition [64]int
 
    // Mirror side to move
-   // board.Side ^= 1
+   board.Side ^= 1
 
+   // todo this (for loop) does not mirror bitboards: 
+   //      example e2e4 c7c6 should mirror as c2c3 e7e5 but this mirrors it as e2e4 c7c5 (i.e. just reverses the colors)
    // Mirror bit boards
    for idx, _ := range board.bitboards {
       // swap piece bitboards i.e. WP becomes BP now
@@ -201,14 +204,26 @@ func MirrorBoard(board *Board) {
    }
 
    // Mirror pieces in position variable & update material score
-   for sq, originalPiece := range board.position {
-      mirroredPiece := swapPiece[originalPiece]
+   // Invert pieces' positions
+   for sq := range board.position {
+      tempPosition[sq] = board.position[Mirror64[sq]]
+   }
+
+   // reset board
+   for sq := range board.position {
+      board.position[sq] = NoPiece
+   }
+
+   // Swap white & black pieces
+   for sq := range board.position {
+      mirroredPiece := swapPiece[tempPosition[sq]]
+      board.position[sq] = mirroredPiece
+
       if mirroredPiece < BP {
          tempMaterial[White] += PieceValue[mirroredPiece]
       } else {
          tempMaterial[Black] += PieceValue[mirroredPiece]
       }
-      board.position[sq] = mirroredPiece
    }
    board.material = tempMaterial
    

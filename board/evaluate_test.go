@@ -59,7 +59,8 @@ func TestMirrorBoard(t *testing.T) {
 	
 	InitHashKeys()
 	board := Board{}
-	board.ParseFen(StartingPosition)
+	// board.ParseFen(StartingPosition)
+	board.ParseFen("rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
 	
 	whiteMaterial := board.material[White]
 	blackMaterial := board.material[Black]

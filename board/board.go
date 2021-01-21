@@ -163,34 +163,34 @@ func (board *Board) Reset() {
 	board.positionKey = 0
 }
 
-// String Return string representing the current board (from the stored bitboards)
+// String Return string representing the current board (from the stored position)
 func (board *Board) String() string {
 	var position [8][8]string
 
 	for i := 0; i < 64; i++ {
-		if ((board.bitboards[WP] >> i) & 1) == 1 {
+		if board.position[i] == WP {
 			position[i/8][i%8] = "P"
-		} else if ((board.bitboards[WN] >> i) & 1) == 1 {
+		} else if board.position[i] == WN {
 			position[i/8][i%8] = "N"
-		} else if ((board.bitboards[WB] >> i) & 1) == 1 {
+		} else if board.position[i] == WB {
 			position[i/8][i%8] = "B"
-		} else if ((board.bitboards[WR] >> i) & 1) == 1 {
+		} else if board.position[i] == WR {
 			position[i/8][i%8] = "R"
-		} else if ((board.bitboards[WQ] >> i) & 1) == 1 {
+		} else if board.position[i] == WQ {
 			position[i/8][i%8] = "Q"
-		} else if ((board.bitboards[WK] >> i) & 1) == 1 {
+		} else if board.position[i] == WK {
 			position[i/8][i%8] = "K"
-		} else if ((board.bitboards[BP] >> i) & 1) == 1 {
+		} else if board.position[i] == BP {
 			position[i/8][i%8] = "p"
-		} else if ((board.bitboards[BN] >> i) & 1) == 1 {
+		} else if board.position[i] == BN {
 			position[i/8][i%8] = "n"
-		} else if ((board.bitboards[BB] >> i) & 1) == 1 {
+		} else if board.position[i] == BB {
 			position[i/8][i%8] = "b"
-		} else if ((board.bitboards[BR] >> i) & 1) == 1 {
+		} else if board.position[i] == BR {
 			position[i/8][i%8] = "r"
-		} else if ((board.bitboards[BQ] >> i) & 1) == 1 {
+		} else if board.position[i] == BQ {
 			position[i/8][i%8] = "q"
-		} else if ((board.bitboards[BK] >> i) & 1) == 1 {
+		} else if board.position[i] == BK {
 			position[i/8][i%8] = "k"
 		} else {
 			position[i/8][i%8] = "."
