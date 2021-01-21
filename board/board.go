@@ -163,7 +163,7 @@ func (board *Board) Reset() {
 	board.positionKey = 0
 }
 
-// String Return string representing the current board (from the stored position)
+// String Return string representing the current board (from the stored bitboards)
 func (board *Board) String() string {
 	var position [8][8]string
 

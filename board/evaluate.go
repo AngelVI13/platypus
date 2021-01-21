@@ -185,23 +185,43 @@ func (board *Board) EvalPosition() int {
    return score
 }
 
+// FlipVertical Flip a bitboard vertically about the centre ranks. 
+// Rank 1 is mapped to rank 8 and vice versa.
+// Taken from: https://www.chessprogramming.org/Flipping_Mirroring_and_Rotating
+func FlipVertical(bb uint64) uint64 {
+   return ( (bb << 56)                      ) |
+          ( (bb << 40) & 0x00ff000000000000 ) |
+          ( (bb << 24) & 0x0000ff0000000000 ) |
+          ( (bb <<  8) & 0x000000ff00000000 ) |
+          ( (bb >>  8) & 0x00000000ff000000 ) |
+          ( (bb >> 24) & 0x0000000000ff0000 ) |
+          ( (bb >> 40) & 0x000000000000ff00 ) |
+          ( (bb >> 56) )
+}
+
 // MirrorBoard takes in a position and modifies it to be the mirrored version of it
 // Only used for testing.
 func MirrorBoard(board *Board) {
    var swapPiece = [14]int{NoPiece, BP, BN, BB, BR, BQ, BK, WP, WN, WB, WR, WQ, WK, EP }
    var tempMaterial = [2]int{0, 0}
    var tempPosition [64]int
+   var tempBitboards [14]uint64
 
    // Mirror side to move
    board.Side ^= 1
 
-   // todo this (for loop) does not mirror bitboards: 
-   //      example e2e4 c7c6 should mirror as c2c3 e7e5 but this mirrors it as e2e4 c7c5 (i.e. just reverses the colors)
-   // Mirror bit boards
-   for idx, _ := range board.bitboards {
-      // swap piece bitboards i.e. WP becomes BP now
-      board.bitboards[idx], board.bitboards[swapPiece[idx]] = board.bitboards[swapPiece[idx]], board.bitboards[idx]
+   // Flip bitboards
+   for idx, bitboard := range board.bitboards {
+      // flip bitboards vertically
+      board.bitboards[idx] = FlipVertical(bitboard)
    }
+
+   // Mirro bitboards
+   // swap piece bitboards i.e. WP becomes BP now
+   for idx := range board.bitboards {
+      tempBitboards[idx] = board.bitboards[swapPiece[idx]]
+   }
+   board.bitboards = tempBitboards
 
    // Mirror pieces in position variable & update material score
    // Invert pieces' positions
