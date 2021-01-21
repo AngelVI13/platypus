@@ -22,7 +22,7 @@ func TestMakeMoveStartPos(t *testing.T) {
 	board.TakeMove()
 	
 	if board.positionKey != originalKey {
-		t.Errorf("PosKey mismatch: %X != %X\n", board.positionKey, originalKey)
+		t.Errorf("PosKey mismatch: %d != %d\n", board.positionKey, originalKey)
 	}
 }
 
@@ -54,7 +54,7 @@ func TestMakeMoveTwoStartPos(t *testing.T) {
 	board.TakeMove()
 	
 	if board.positionKey != originalKey {
-		t.Errorf("PosKey mismatch: %X != %X\n", board.positionKey, originalKey)
+		t.Errorf("PosKey mismatch: %d != %d\n", board.positionKey, originalKey)
 	}
 }
 
@@ -76,7 +76,7 @@ func TestMakeMoveEnPassant(t *testing.T) {
 	board.TakeMove()
 	
 	if board.positionKey != originalKey {
-		t.Errorf("PosKey mismatch: %X != %X\n", board.positionKey, originalKey)
+		t.Errorf("PosKey mismatch: %d != %d\n", board.positionKey, originalKey)
 	}
 }
 
@@ -98,7 +98,7 @@ func TestMakeMoveCapture(t *testing.T) {
 	board.TakeMove()
 	
 	if board.positionKey != originalKey {
-		t.Errorf("PosKey mismatch: %X != %X\n", board.positionKey, originalKey)
+		t.Errorf("PosKey mismatch: %d != %d\n", board.positionKey, originalKey)
 	}
 }
 
@@ -120,7 +120,7 @@ func TestMakeMoveCastle(t *testing.T) {
 	board.TakeMove()
 	
 	if board.positionKey != originalKey {
-		t.Errorf("PosKey mismatch: %X != %X\n", board.positionKey, originalKey)
+		t.Errorf("PosKey mismatch: %d != %d\n", board.positionKey, originalKey)
 	}
 }
 
@@ -142,6 +142,6 @@ func TestMakeMovePromotion(t *testing.T) {
 	board.TakeMove()
 
 	if board.positionKey != originalKey {
-		t.Errorf("PosKey mismatch: %X != %X\n", board.positionKey, originalKey)
+		t.Errorf("PosKey mismatch: %d != %d\n", board.positionKey, originalKey)
 	}
 }

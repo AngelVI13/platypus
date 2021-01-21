@@ -3,6 +3,7 @@ package board
 import (
 	"fmt"
 	"math/bits"
+	"strconv"
 )
 
 // StartingPosition 8x8 representation of normal chess starting position
@@ -143,7 +144,6 @@ type Board struct {
 
 // Reset Resets current board
 func (board *Board) Reset() {
-	// todo update with all variables
 	for i := 0; i < 14; i++ {
 		board.bitboards[i] = uint64(0)
 	}
@@ -216,7 +216,12 @@ func (board *Board) String() string {
 
 	// ---
 	positionStr += fmt.Sprintf("side:%c\n", SideChar[board.Side])
-	positionStr += fmt.Sprintf("enPasFile:%d\n", bits.TrailingZeros64(board.bitboards[EP]))
+
+	enPassantFile := "-"
+	if board.bitboards[EP] != 0 {
+		enPassantFile = strconv.Itoa(bits.TrailingZeros64(board.bitboards[EP]))
+	}
+	positionStr += fmt.Sprintf("enPasFile:%s\n", enPassantFile)
 	
 	// Compute castling permissions
 	wKCA := "-"
@@ -240,7 +245,7 @@ func (board *Board) String() string {
 	}
 
 	positionStr += fmt.Sprintf("castle:%s%s%s%s\n", wKCA, wQCA, bKCA, bQCA)
-	positionStr += fmt.Sprintf("PosKey:%X\n", board.positionKey)
+	positionStr += fmt.Sprintf("PosKey:%d\n", board.positionKey)
 
 	// ---
 

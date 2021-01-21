@@ -1,8 +1,10 @@
 package board
 
 import (
-	// "fmt"
+	"fmt"
 	"math/bits"
+	"strings"
+	"errors"
 )
 
 func (board *Board) removePieceFromSq(pieceType, sq int) {
@@ -130,7 +132,6 @@ func (board *Board) MakeMove(move int) {
 
 	if promoted := Promoted(move); promoted > 0 {
 		// PerftPromotions++
-		// todo update material here
 		board.addPieceToSq(promoted, toSq)
 		board.position[toSq] = promoted
 		// we already move the pawn to the 8th rank and since it is a promotion
@@ -250,4 +251,21 @@ func (board *Board) TakeMove() {
 		board.addPieceToSq(pawn, fromSq)
 		board.position[fromSq] = pawn
 	}
+}
+
+// todo how to handle with a messed up board (if first few moves are okay but the last one is not valid?)
+// PerformMoves Takes a string containing a space separated list of moves 
+// and applies them to the board. Example `moves`: "e2e4 d7d5" ...
+func (board *Board) MakeMoves(moves string) error {
+	moveSlice := strings.Split(moves, " ")
+	for _, moveString := range moveSlice {
+		moveList := board.GetMoves()
+		move, err := GetMoveFromString(&moveList, moveString)
+		if err != nil {
+			return errors.New(fmt.Sprintf("Incorrect move string: %s", moveString))
+		}
+		board.MakeMove(move)
+	}
+
+	return nil
 }

@@ -2,6 +2,7 @@ package board
 
 import (
 	"fmt"
+	"errors"
 )
 
 // The following bitmasks represent squares starting from H1-A1 -> H8-A8. Ranks are separated by "_"
@@ -272,6 +273,18 @@ func PrintMoveList(moveList *MoveList) {
 		fmt.Printf("Move:%d > %s (score:%d)\n", index+1, GetMoveString(move), score)
 	}
 	fmt.Printf("MoveList Total %d Moves:\n\n", moveList.Count)
+}
+
+func GetMoveFromString(moveList *MoveList, moveString string) (int, error) {
+	for index := 0; index < moveList.Count; index++ {
+		move := moveList.Moves[index].Move
+
+		if GetMoveString(move) == moveString {
+			return move, nil
+		}
+	}
+
+	return 0, errors.New(fmt.Sprintf("No move matches the string: %s", moveString))
 }
 
 // DrawBitboard Prints a given bitboard to stdout in a human readable way

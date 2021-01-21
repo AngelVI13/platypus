@@ -18,7 +18,6 @@ var PieceValue = map[int]int{
 }
 
 // PawnTable pawn table
-// todo Convert all tables to 120-index based in order to remove unnecessary conversion between 120 -> 64 -> 120
 var PawnTable = [BoardSquareNum]int{
 	0,  0,  0,   0,   0,  0,  0,  0,
    10, 10,  0, -10, -10,  0, 10, 10,
@@ -182,5 +181,58 @@ func (board *Board) EvalPosition() int {
    // }
    // return -score
 
+   // todo remove this
    return score
+}
+
+// MirrorBoard takes in a position and modifies it to be the mirrored version of it
+// Only used for testing.
+func MirrorBoard(board *Board) {
+   var swapPiece = [14]int{NoPiece, BP, BN, BB, BR, BQ, BK, WP, WN, WB, WR, WQ, WK, EP }
+   var tempMaterial = [2]int{0, 0}
+
+   // Mirror side to move
+   // board.Side ^= 1
+
+   // Mirror bit boards
+   for idx, _ := range board.bitboards {
+      // swap piece bitboards i.e. WP becomes BP now
+      board.bitboards[idx], board.bitboards[swapPiece[idx]] = board.bitboards[swapPiece[idx]], board.bitboards[idx]
+   }
+
+   // Mirror pieces in position variable & update material score
+   for sq, originalPiece := range board.position {
+      mirroredPiece := swapPiece[originalPiece]
+      if mirroredPiece < BP {
+         tempMaterial[White] += PieceValue[mirroredPiece]
+      } else {
+         tempMaterial[Black] += PieceValue[mirroredPiece]
+      }
+      board.position[sq] = mirroredPiece
+   }
+   board.material = tempMaterial
+   
+   // Mirror stateBoards
+   board.UpdateBitMasks()
+
+   // Mirror castling permissions
+   var tempCastlePerm = 0
+   if board.castlePermissions&WhiteKingCastling != 0 {
+      tempCastlePerm |= BlackKingCastling
+   }
+
+   if board.castlePermissions&WhiteQueenCastling != 0 {
+      tempCastlePerm |= BlackQueenCastling
+   }
+
+   if board.castlePermissions&BlackKingCastling != 0 {
+      tempCastlePerm |= WhiteKingCastling
+   }
+
+   if board.castlePermissions&BlackQueenCastling != 0 {
+      tempCastlePerm |= WhiteQueenCastling
+   }
+   board.castlePermissions = tempCastlePerm
+
+   board.positionKey = GeneratePositionKey(board)
 }

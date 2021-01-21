@@ -1,6 +1,9 @@
 package board
 
-import "testing"
+import (
+	"testing"
+	"fmt"
+)
 
 
 func TestMaterialStartPos(t *testing.T) {
@@ -46,6 +49,64 @@ func TestMaterialStartPosWithMoves(t *testing.T) {
 		t.Errorf(
 			"Incorrect material for position: White: %d != Black %d\n",
 			whiteMaterial, blackMaterial,
+		)
+	}
+}
+
+func TestMirrorBoard(t *testing.T) {
+	// Create a board with starting position.
+	// Expect that material for both black and white will be equal
+	
+	InitHashKeys()
+	board := Board{}
+	board.ParseFen(StartingPosition)
+	
+	whiteMaterial := board.material[White]
+	blackMaterial := board.material[Black]
+	positionKey := board.positionKey
+
+	fmt.Println(&board)
+
+	MirrorBoard(&board)
+
+	fmt.Println(&board)
+
+	if whiteMaterial != board.material[White] {
+		t.Errorf(
+			"Incorrect material for white startpos after mirror: Initial: %d != Mirror %d\n",
+			whiteMaterial, board.material[White],
+		)
+	}
+
+	if blackMaterial != board.material[Black] {
+		t.Errorf(
+			"Incorrect material for black startpos after mirror: Initial: %d != Mirror %d\n",
+			blackMaterial, board.material[Black],
+		)
+	}
+
+	fmt.Println(board.positionKey)
+	if positionKey != board.positionKey {
+		t.Errorf(
+			"Incorrect positionKey for startpos after mirror: Initial: %d != Mirror %d\n",
+			positionKey, board.positionKey,
+		)
+	}
+}
+
+func TestGeneratePositionKey(t *testing.T) {
+	// Create a board with starting position.
+	// Expect position key after ParseFen and GeneratePositionKey for the same position
+	// are equal
+	
+	InitHashKeys()
+	board := Board{}
+	board.ParseFen(StartingPosition)
+	
+	if GeneratePositionKey(&board) != board.positionKey {
+		t.Errorf(
+			"PositionKey mismatch: ParseFen: %d != GeneratePositionKey %d\n",
+			board.positionKey, GeneratePositionKey(&board),
 		)
 	}
 }

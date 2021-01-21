@@ -72,19 +72,17 @@ func InitHashKeys() {
 
 // GeneratePositionKey takes a position and calculates a unique hashkey for it
 func GeneratePositionKey(board *Board) (hashKey uint64) {
-	for pieceType := WP; pieceType <= BK; pieceType++ {
-		bitboard := board.bitboards[pieceType]
-
-		piece := bitboard & (^(bitboard - 1))
-		for piece != 0 {
-			pieceSquare := bits.TrailingZeros64(piece)
-			hashKey ^= PieceKeys[pieceType][pieceSquare]
-		}
+	for square, piece := range board.position {
+		if piece != NoPiece {
+			hashKey ^= PieceKeys[piece][square]
+		}	
 	}
-
-	// take bitboard of en passant file, select only the first rank, find which file it is
-	enPassantFile := bits.TrailingZeros64(board.bitboards[EP])
-	hashKey ^= PieceKeys[EP][enPassantFile]
+	
+	if board.bitboards[EP] != 0 {
+		// take bitboard of en passant file, select only the first rank, find which file it is
+		enPassantFile := bits.TrailingZeros64(board.bitboards[EP])
+		hashKey ^= PieceKeys[EP][enPassantFile]
+	}
 
 	if board.Side == White {
 		hashKey ^= SideKey

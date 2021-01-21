@@ -58,6 +58,7 @@ func (board *Board) ParseFen(fen string) {
 		board.bitboards[piece] |= (1 << count)
 		board.position[count] = piece
 		board.material[color] += PieceValue[piece]
+		board.positionKey ^= PieceKeys[piece][count]
 		char++
 		count++
 	}
