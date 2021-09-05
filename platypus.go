@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"platypus/board"
+	"github.com/AngelVI13/platypus/board"
 )
 
 func main() {

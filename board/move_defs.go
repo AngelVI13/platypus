@@ -1,8 +1,8 @@
 package board
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 )
 
 // The following bitmasks represent squares starting from H1-A1 -> H8-A8. Ranks are separated by "_"
@@ -227,8 +227,8 @@ func GetSquareString(sq int) string {
 	// "a"[0] -> returns the byte value of the char 'a' -> convert to int to get ascii value
 	// then add the file/rank value to it and convert back to string
 	// therefore this automatically translates the files from 0-7 to a-h
-	fileStr := string(int("a"[0]) + file)
-	rankStr := string(int("1"[0]) + rank)
+	fileStr := string(rune(int("a"[0]) + file))
+	rankStr := string(rune(int("1"[0]) + rank))
 
 	squareStr := fileStr + rankStr
 	return squareStr

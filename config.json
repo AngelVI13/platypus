@@ -1,0 +1,21 @@
+{
+	"RootPath": "./",
+	"IncludePatterns": [
+		"*.go"
+	],
+	"ExcludePatterns": [
+		"*.exe",
+		"*.git*",
+		"*.swp"
+	],
+	"Delimiter": "\u003e\u003e\u003e",
+	"Interval": 2,
+	"FilesPlaceholder": "%files%",
+	"Commands": [
+		"clear",
+		"gofmt -w %files%",
+		"go vet .",
+		"ctags --options=C:/Users/avili/.ctags",
+		"go test ./board"
+	]
+}
